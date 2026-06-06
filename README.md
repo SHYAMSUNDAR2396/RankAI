@@ -1,4 +1,4 @@
-<![CDATA[<div align="center">
+<div align="center">
 
 # 🧠 RankAI
 
@@ -679,4 +679,3 @@ The LLM swap seam is isolated in `OllamaClient`. You can switch to [Groq](https:
 ## 📄 License
 
 This project is licensed under the [MIT License](./LICENSE).
-]]>
