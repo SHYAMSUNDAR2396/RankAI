@@ -1,6 +1,10 @@
 MIT License
 
+<<<<<<< HEAD
 Copyright (c) 2026 shyamsundar m
+=======
+Copyright (c) 2026 Shyam Sundar
+>>>>>>> 8aa8a38 (chore: initialize project with README, MIT license, and main entry point)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

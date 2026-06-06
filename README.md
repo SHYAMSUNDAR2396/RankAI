@@ -1,194 +1,587 @@
-# Candidate Ranking System
+<![CDATA[<div align="center">
 
-Ranks a set of candidates against a single job description using a locally hosted LLM (Ollama), local sentence-transformers embeddings, and an on-disk ChromaDB vector store. It produces a ranked CSV of every candidate alongside a counterfactual bias audit report that flags scoring sensitivity to demographic signals. After the initial model downloads it runs entirely free and offline, with no API keys and no paid services.
+# 🧠 RankAI
 
-## Prerequisites
+### Local-First, Bias-Audited AI Candidate Ranking System
 
-- **Python 3.11+** (the package targets `requires-python >= 3.11`).
-- **Ollama** installed and runnable locally.
-- All required **Ollama models** pulled (see Installation).
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](#prerequisites)
+[![Ollama](https://img.shields.io/badge/Ollama-Local%20LLM-000000?logo=ollama)](#prerequisites)
+[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)](#web-dashboard)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?logo=fastapi&logoColor=white)](#web-dashboard)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-On first use, `sentence-transformers` downloads the embedding model **`BAAI/bge-large-en-v1.5`** (~1.3GB). This is the only network access the pipeline needs, and only once.
+**Rank candidates against any job description using a multi-model AI panel — entirely free, entirely offline, with built-in bias detection.**
 
-## Installation
+[Quick Start](#quick-start) · [Architecture](#architecture) · [Pipeline Workflow](#pipeline-workflow) · [Web Dashboard](#web-dashboard) · [Methodology](./methodology.md)
+
+</div>
+
+---
+
+## ✨ What Is RankAI?
+
+RankAI evaluates candidates the way a real hiring panel would — three AI personas with different evaluation lenses score each candidate, debate, and produce a defensible ranking with full explainability. A counterfactual fairness audit then stress-tests every score for demographic sensitivity.
+
+**Key principles:**
+- 🔒 **Local-first** — Resumes never leave your machine. Zero API keys, zero cloud calls.
+- 🎯 **Multi-persona scoring** — Hiring Manager, Peer Interviewer, and Devil's Advocate each evaluate independently.
+- ⚖️ **Bias-audited** — Counterfactual twins detect scoring sensitivity to names, pronouns, and institutions.
+- 🧩 **Multi-model routing** — Each agent uses the LLM best suited to its cognitive load.
+- 📊 **Explainable** — Every score comes with strengths, concerns, a narrative, and a verdict.
+
+---
+
+## 📐 Architecture
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│                      React Dashboard (Vite + TS)                     │
+│  ┌───────────┐  ┌────────────────┐  ┌──────────┐  ┌──────────────┐  │
+│  │ Dashboard  │  │ Candidate      │  │ Audit    │  │ Pipeline     │  │
+│  │ Page       │  │ Detail Page    │  │ Report   │  │ Setup Wizard │  │
+│  └───────────┘  └────────────────┘  └──────────┘  └──────────────┘  │
+│                      ▼ Vite Proxy /api → :8000                       │
+├──────────────────────────────────────────────────────────────────────┤
+│                    FastAPI Backend (server.py)                        │
+│  ┌──────────┐ ┌───────────┐ ┌───────────┐ ┌───────────────────────┐  │
+│  │GET /api/ │ │POST /api/ │ │POST /api/ │ │GET /api/export/csv    │  │
+│  │candidates│ │run        │ │upload/*   │ │                       │  │
+│  └──────────┘ └───────────┘ └───────────┘ └───────────────────────┘  │
+│                      ▼ Subprocess                                    │
+├──────────────────────────────────────────────────────────────────────┤
+│                 Python ML Pipeline (main.py)                         │
+│  ┌────────┐  ┌────────┐  ┌─────────┐  ┌───────┐  ┌──────────────┐   │
+│  │ INGEST │→ │ ENRICH │→ │ EMBED & │→ │ SCORE │→ │ AUDIT &      │   │
+│  │        │  │        │  │ STORE   │  │       │  │ OUTPUT       │   │
+│  └───┬────┘  └───┬────┘  └────┬────┘  └───┬───┘  └──────┬───────┘   │
+│      ▼           ▼            ▼            ▼             ▼           │
+│  ┌────────┐  ┌────────┐  ┌────────┐  ┌──────────┐  ┌────────────┐   │
+│  │ Ollama │  │ Ollama │  │ChromaDB│  │ Ollama   │  │ ranked.csv │   │
+│  │ qwen   │  │deepseek│  │ Vector │  │ 3 Models │  │ audit.json │   │
+│  │ 2.5:7b │  │ r1:7b  │  │ Store  │  │(3 pers.) │  │            │   │
+│  └────────┘  └────────┘  └────────┘  └──────────┘  └────────────┘   │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🗂 Project Structure
+
+```
+RankAI/
+├── main.py                          # Pipeline orchestrator & CLI entry point
+├── config.py                        # Centralized config: models, weights, thresholds
+├── server.py                        # FastAPI REST API backend
+├── pyproject.toml                   # Python project metadata
+├── requirements.txt                 # Pinned dependency manifest
+├── methodology.md                   # Detailed scoring methodology
+├── ARCHITECTURE.md                  # In-depth architecture guide
+│
+├── models/                          # Pydantic v2 data models
+│   ├── candidate.py                 #   CandidateProfile, CandidateRole, TrajectoryVector
+│   └── job.py                       #   JobDescription, JobRequirement
+│
+├── pipeline/                        # Core pipeline phases
+│   ├── ingest.py                    #   ResumeParser (PDF/DOCX/JSON) & JdParser
+│   ├── enrich.py                    #   TrajectoryEnricher (career metrics)
+│   ├── embed.py                     #   VectorStoreManager (ChromaDB + embeddings)
+│   └── score.py                     #   CandidateScoringPipeline (multi-persona)
+│
+├── audit/                           # Fairness auditing
+│   └── counterfactual.py            #   CounterfactualAuditor (twin-swap bias detection)
+│
+├── output/                          # Output module
+│   └── writer.py                    #   rank_candidates(), write_ranked_csv()
+│
+├── personas/                        # LLM persona system prompts
+│   ├── hiring_manager.txt           #   Strategic fit & trajectory evaluator
+│   ├── peer_interviewer.txt         #   Technical depth & collaboration evaluator
+│   └── devils_advocate.txt          #   Risk, red flags & overqualification evaluator
+│
+├── utils/                           # Cross-cutting utilities
+│   └── ollama_client.py             #   OllamaClient: retry, logging, JSON parsing
+│
+├── data/                            # Input data
+│   ├── sample_candidates.json       #   15 sample candidate profiles
+│   └── sample_job_description.json  #   Sample job description (Senior Data Scientist)
+│
+├── chroma_store/                    # ChromaDB on-disk vector store (auto-generated)
+│
+├── tests/                           # Test suite (76 tests, fully offline)
+│   ├── test_ingest.py               #   INGEST phase tests
+│   ├── test_embed.py                #   EMBED & STORE phase tests
+│   └── test_score.py                #   SCORE phase tests
+│
+└── frontend/                        # React + Vite dashboard
+    ├── package.json
+    ├── vite.config.ts               #   Dev proxy /api → localhost:8000
+    ├── tailwind.config.ts           #   Tailwind v4 design tokens
+    └── src/
+        ├── main.tsx                 #   React entry point
+        ├── App.tsx                  #   Router (BrowserRouter, 5 routes)
+        ├── api.ts                   #   API client (fetch wrapper for /api/*)
+        ├── types.ts                 #   TypeScript interfaces
+        ├── index.css                #   Design system (tokens, animations)
+        ├── components/
+        │   ├── SideNavBar.tsx       #   Fixed sidebar navigation
+        │   └── TopAppBar.tsx        #   Page-level header bar
+        └── pages/
+            ├── DashboardPage.tsx    #   Ranked candidates table + metrics
+            ├── CandidateDetailPage.tsx  #   Individual candidate deep-dive
+            ├── AuditReportPage.tsx  #   Fairness audit visualization
+            ├── SetupPipelinePage.tsx #   3-step pipeline wizard + progress UI
+            └── EmptyStatePage.tsx   #   Empty state when no data is loaded
+```
+
+---
+
+## 🤖 Multi-Model Agent Routing
+
+RankAI assigns each AI agent the model best suited to its cognitive load, rather than using a single model for everything:
+
+| Agent | Model | Why This Model |
+|---|---|---|
+| Resume Parser | `qwen2.5:7b` | Best open-source JSON adherence for structured extraction |
+| JD Parser | `qwen2.5:7b` | Requirement classification needs reliable JSON output |
+| Orchestrator | `llama3.1:8b` | Strong multi-step reasoning for routing and state |
+| Skills Match | `llama3.2:3b` | RAG does the heavy lifting; simple list comparison only |
+| Trajectory Scorer | `deepseek-r1:7b` | Reasoning model; infers growth from sparse career data |
+| Hiring Manager | `llama3.1:8b` | Highest weight persona (0.45); nuanced judgment needed |
+| Peer Interviewer | `qwen2.5:14b` | Technical depth requires the largest knowledge base |
+| Devil's Advocate | `deepseek-r1:7b` | Adversarial reasoning; chain-of-thought finds gaps |
+| Narrative | `llama3.2:3b` | Short text generation; smallest capable model |
+
+> **Low-memory machines**: Set `LOW_MEMORY_MODE = True` in `config.py` to substitute `qwen2.5:14b` → `qwen2.5:7b` and `deepseek-r1:7b` → `llama3.1:8b`, saving ~4GB RAM.
+
+---
+
+## 🔄 Pipeline Workflow
+
+The pipeline runs 6 phases in strict sequence. Here is the complete end-to-end workflow annotated with timestamps from a real 15-candidate run:
+
+```
+╔══════════════════════════════════════════════════════════════════════════╗
+║                        RankAI Pipeline Workflow                         ║
+║                    (15 candidates • ~2.7 hours total)                   ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+ ┌─────────────────────────────────────────────────────────────────────┐
+ │  PHASE 0 — STARTUP VERIFICATION                         [~1 sec]  │
+ │                                                                     │
+ │  ① Connect to Ollama server at localhost:11434                      │
+ │  ② Verify all 5 LLM models are pulled:                             │
+ │     deepseek-r1:7b, llama3.2:3b, qwen2.5:14b,                     │
+ │     qwen2.5:7b, llama3.1:8b                                       │
+ │  ③ Verify embedding model: BAAI/bge-large-en-v1.5                  │
+ │  ④ Initialize ChromaDB collections:                                │
+ │     jd_requirements, candidate_profiles, calibration_examples       │
+ └────────────────────────────┬────────────────────────────────────────┘
+                              ▼
+ ┌─────────────────────────────────────────────────────────────────────┐
+ │  PHASE 1 — INGEST                                       [~1 sec]  │
+ │                                                                     │
+ │  ┌──────────────┐     ┌───────────────────────────────────┐        │
+ │  │ JD Parser    │────▶│ JobDescription                    │        │
+ │  │ (qwen2.5:7b) │     │ title: "Senior Data Scientist"    │        │
+ │  └──────────────┘     │ requirements: 11 items             │        │
+ │                        │   must_have ──── 4                │        │
+ │                        │   nice_to_have ─ 3                │        │
+ │                        │   culture_signal 2                │        │
+ │                        │   seniority_marker 2              │        │
+ │                        └───────────────────────────────────┘        │
+ │                                                                     │
+ │  ┌──────────────┐     ┌───────────────────────────────────┐        │
+ │  │Resume Parser │────▶│ CandidateProfile[]                │        │
+ │  │(qwen2.5:7b)  │     │ 15 candidates loaded from         │        │
+ │  │              │     │ data/sample_candidates.json        │        │
+ │  │ Supports:    │     │                                   │        │
+ │  │  • .json     │     │ Validation: Pydantic v2            │        │
+ │  │  • .pdf      │     │ Retry: once on validation failure  │        │
+ │  │  • .docx     │     │ Fallback: spaCy for name/email     │        │
+ │  └──────────────┘     └───────────────────────────────────┘        │
+ └────────────────────────────┬────────────────────────────────────────┘
+                              ▼
+ ┌─────────────────────────────────────────────────────────────────────┐
+ │  PHASE 2 — EMBED & STORE                             [~4 minutes]  │
+ │                                                                     │
+ │  Embedding model: BAAI/bge-large-en-v1.5 (1.34 GB)                 │
+ │  Device: CPU (auto-detected)                                        │
+ │                                                                     │
+ │  ┌─────────────────────────────────────────────────────────┐        │
+ │  │              ChromaDB Collections                       │        │
+ │  │                                                         │        │
+ │  │  jd_requirements ──── 11 requirement vectors stored     │        │
+ │  │  calibration_examples ─ 10 labeled reference candidates │        │
+ │  │    (5 strong_hire + 5 no_hire)                          │        │
+ │  └─────────────────────────────────────────────────────────┘        │
+ └────────────────────────────┬────────────────────────────────────────┘
+                              ▼
+ ┌─────────────────────────────────────────────────────────────────────┐
+ │  PHASE 3 — ENRICH + EMBED CANDIDATES              [~18 minutes]   │
+ │                                                                     │
+ │  For each candidate (1→15):                                         │
+ │  ┌─────────────────────────────────────────────────────────┐        │
+ │  │  ① Compute Trajectory_Vector                            │        │
+ │  │     ├── growth_rate ────── seniority levels/year [0,1]  │        │
+ │  │     ├── complexity_arc ── company size trend             │        │
+ │  │     ├── leadership_progression ── leadership % [0,1]    │        │
+ │  │     ├── tenure_consistency ── 1−(σ/μ) of durations      │        │
+ │  │     └── seniority_score ── LLM-derived (deepseek-r1:7b) │        │
+ │  │                            [0,10], default 5.0           │        │
+ │  │                                                         │        │
+ │  │  ② Embed and store in ChromaDB                          │        │
+ │  │     ├── {id}_summary ── profile summary chunk            │        │
+ │  │     └── {id}_skills ─── skills chunk                     │        │
+ │  └─────────────────────────────────────────────────────────┘        │
+ │                                                                     │
+ │  Progress: ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 15/15               │
+ │                                                                     │
+ │  Candidates enriched:                                               │
+ │   1/15 Sofia Ramirez ··· 15/15 Neha Sharma                         │
+ └────────────────────────────┬────────────────────────────────────────┘
+                              ▼
+ ┌─────────────────────────────────────────────────────────────────────┐
+ │  PHASE 4 — SCORE                                  [~1 hr 43 min]  │
+ │                                                                     │
+ │  For each candidate:                                                │
+ │  ┌─────────────────────────────────────────────────────────┐        │
+ │  │  ① RAG Retrieval                                        │        │
+ │  │     ├── Top-5 JD requirements (vector similarity)       │        │
+ │  │     └── Top-3 calibration examples (vector similarity)  │        │
+ │  │                                                         │        │
+ │  │  ② Three-Persona Panel (sequential LLM calls)           │        │
+ │  │     ┌─────────────────┐                                 │        │
+ │  │     │ Hiring Manager  │ weight: +0.45                   │        │
+ │  │     │ (llama3.1:8b)   │ → strategic fit, trajectory     │        │
+ │  │     └────────┬────────┘                                 │        │
+ │  │              ▼                                          │        │
+ │  │     ┌─────────────────┐                                 │        │
+ │  │     │Peer Interviewer │ weight: +0.35                   │        │
+ │  │     │ (qwen2.5:14b)   │ → technical depth, collab       │        │
+ │  │     └────────┬────────┘                                 │        │
+ │  │              ▼                                          │        │
+ │  │     ┌─────────────────┐                                 │        │
+ │  │     │Devil's Advocate │ weight: −0.20 (subtracted!)     │        │
+ │  │     │(deepseek-r1:7b) │ → risks, gaps, red flags        │        │
+ │  │     └────────┬────────┘                                 │        │
+ │  │              ▼                                          │        │
+ │  │  ③ Compute Scores                                       │        │
+ │  │     composite = 0.45×HM + 0.35×PI − 0.20×DA            │        │
+ │  │     panel_variance = σ²(HM, PI, DA)                     │        │
+ │  │     human_review = True if variance > 2.5               │        │
+ │  │                                                         │        │
+ │  │  ④ Generate 3-sentence narrative (llama3.2:3b)          │        │
+ │  │     → Primary strength, main concern, confidence gap     │        │
+ │  └─────────────────────────────────────────────────────────┘        │
+ │                                                                     │
+ │  Scoring progress: ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 15/15             │
+ │  Successfully scored: 5 candidates                                  │
+ └────────────────────────────┬────────────────────────────────────────┘
+                              ▼
+ ┌─────────────────────────────────────────────────────────────────────┐
+ │  PHASE 5 — COUNTERFACTUAL FAIRNESS AUDIT            [~34 minutes] │
+ │                                                                     │
+ │  For each scored candidate:                                         │
+ │  ┌─────────────────────────────────────────────────────────┐        │
+ │  │  ① Build counterfactual "twin"                          │        │
+ │  │     ├── Swap names (bidirectional pairs from config)     │        │
+ │  │     ├── Swap pronouns (he↔she, him↔her, his↔hers)       │        │
+ │  │     └── Swap institutions (prestigious↔lower-prestige)  │        │
+ │  │                                                         │        │
+ │  │  ② Re-parse → Re-enrich → Re-score the twin            │        │
+ │  │     (full pipeline re-run with cf_ prefixed ID)          │        │
+ │  │                                                         │        │
+ │  │  ③ Compute delta = |original_score − twin_score|        │        │
+ │  │                                                         │        │
+ │  │  ④ Flag if delta > 0.75 → potential bias detected        │        │
+ │  └─────────────────────────────────────────────────────────┘        │
+ │                                                                     │
+ │  Audit results: 5 audited → 3 flagged (⚠)                          │
+ │  Report: output/bias_audit_report.json                              │
+ └────────────────────────────┬────────────────────────────────────────┘
+                              ▼
+ ┌─────────────────────────────────────────────────────────────────────┐
+ │  PHASE 6 — OUTPUT                                       [~1 sec]  │
+ │                                                                     │
+ │  ┌──────────────────────────────────────────────────────┐           │
+ │  │  ranked_candidates.csv   (16 columns × 5 rows)      │           │
+ │  │  ────────────────────────────────────────────────    │           │
+ │  │  Rank  Name             Composite  Verdict  Bias     │           │
+ │  │   1    Ashley Nguyen       4.20    maybe    Clean    │           │
+ │  │   2    Priya Nair          3.37    maybe    Clean    │           │
+ │  │   3    Marcus Bell         2.60    maybe    ⚠ FLAG   │           │
+ │  │   4    Shyam Sundar        1.94    maybe    ⚠ FLAG   │           │
+ │  │   5    James Smith         1.68    maybe    ⚠ FLAG   │           │
+ │  └──────────────────────────────────────────────────────┘           │
+ │                                                                     │
+ │  bias_audit_report.json                                             │
+ │    audited: 3  |  flagged: 3  |  flag_rate: 100%                    │
+ └─────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+| Requirement | Version | Purpose |
+|---|---|---|
+| Python | 3.11+ | Backend pipeline |
+| Node.js | 18+ | Frontend dashboard |
+| Ollama | Latest | Local LLM inference |
+
+### Installation
 
 ```bash
 # 1. Install Ollama
 curl -fsSL https://ollama.com/install.sh | sh
 
-# 2. Pull all required models
+# 2. Pull all required models (~25 GB total)
 ollama pull llama3.2:3b
 ollama pull llama3.1:8b
 ollama pull qwen2.5:7b
-ollama pull qwen2.5:14b      # Skip if on low-RAM machine, set LOW_MEMORY_MODE=True in config.py
+ollama pull qwen2.5:14b      # Skip on <20GB RAM; set LOW_MEMORY_MODE=True
 ollama pull deepseek-r1:7b
 
-# On Intel/Apple 16GB machines: set LOW_MEMORY_MODE = True in config.py
-# This automatically substitutes lighter models for the heavy ones.
-
-# 3. (Recommended) create and activate a virtualenv
+# 3. Create virtual environment
 python3 -m venv .venv && source .venv/bin/activate
 
-# 4. Install the Python dependencies
+# 4. Install Python dependencies
 pip install -r requirements.txt
 
-# 5. Download the spaCy model used for the name/email fallback
+# 5. Download spaCy model (name/email fallback)
 python -m spacy download en_core_web_sm
 ```
 
-## Running the pipeline
+> **First run note**: The embedding model `BAAI/bge-large-en-v1.5` (~1.3 GB) downloads automatically from HuggingFace on the first pipeline execution. This is the only network access the pipeline ever needs.
 
-Start the Ollama server in a separate terminal if it is not already running:
+### Running the Pipeline (CLI)
 
+Start Ollama in a separate terminal:
 ```bash
 ollama serve
 ```
 
-Run with the bundled sample data (defaults shown):
-
+Run with bundled sample data (15 candidates for a Senior Data Scientist role):
 ```bash
-# Equivalent to:
-#   --candidates-dir ./data/candidates/
-#   --job-description ./data/sample_job_description.json
-#   --output-dir ./output/
 python main.py
 ```
 
-Run with your own candidates directory and job description:
-
+Run with your own data:
 ```bash
-python main.py --candidates-dir ./my_resumes --job-description ./my_jd.txt --output-dir ./out
+python main.py \
+  --candidates-dir ./my_resumes \
+  --job-description ./my_jd.json \
+  --output-dir ./results
 ```
 
-Run faster by skipping the counterfactual fairness audit:
-
+Skip the fairness audit for a faster run (~50% fewer LLM calls):
 ```bash
 python main.py --skip-audit
 ```
 
-Enable verbose/DEBUG logging (LLM request/response detail, per-phase timing):
-
+Enable verbose logging (LLM request/response detail):
 ```bash
 python main.py --verbose
 ```
 
-### Example output
+---
 
-When scoring finishes, the CLI prints a rich table of the top 10 candidates (or all of them when fewer than 10 were scored) followed by a summary panel. The values below are illustrative:
+## 🖥 Web Dashboard
 
-```
-                         Top 10 Candidates
-┏━━━━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━┓
-┃ Rank ┃ Name             ┃ Composite ┃ Verdict    ┃ Human Review ┃ Bias Flag ┃
-┡━━━━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━━━━╇━━━━━━━━━━━┩
-│    1 │ Sofia Ramirez    │      7.92 │ strong_yes │ No           │ Clean     │
-│    2 │ David Okoye      │      7.41 │ yes        │ No           │ Clean     │
-│    3 │ Aisha Khan       │      6.88 │ yes        │ Yes          │ ⚠ FLAG    │
-│    4 │ Mei Tanaka       │      6.10 │ maybe      │ No           │ Clean     │
-│    5 │ Raj Patel        │      5.55 │ maybe      │ No           │ Clean     │
-│  ... │ ...              │       ... │ ...        │ ...          │ ...       │
-└──────┴──────────────────┴───────────┴────────────┴──────────────┴───────────┘
-╭───────────────────────────── Summary ──────────────────────────────╮
-│ Run complete                                                        │
-│ Candidates scored: 15                                               │
-│ Elapsed: 312.84s                                                    │
-│ Ranked CSV: output/ranked_candidates.csv                            │
-│ Bias audit report: output/bias_audit_report.json                    │
-│ Output directory: output                                            │
-╰─────────────────────────────────────────────────────────────────────╯
-```
+RankAI includes a full-stack interactive web dashboard built with **FastAPI + React + Vite + TypeScript + Tailwind CSS v4**.
 
-## Interactive Web Dashboard
+### Features
 
-In addition to the CLI, RankAI includes a fully interactive web dashboard built with a **FastAPI backend** and a **Vite + React + Tailwind CSS v4 frontend** matching the design guidelines.
-
-The web app allows you to:
-- **Explore Rankings**: Review the candidate list with live search, filtering, and composite/persona score bars.
-- **Analyze Candidate Details**: View individual candidate profile breakdowns, LLM-generated narratives, strengths/concerns, and consensus verdict actions.
-- **Audit Fairness**: Inspect the counterfactual bias audit logs with delta comparison charts.
-- **Run New Pipelines**: Use the interactive 3-step setup wizard to upload job descriptions and resumes (via drag-and-drop), and trigger ranking runs.
+| Page | What It Does |
+|---|---|
+| **Dashboard** | Ranked candidates table with live search, filtering, composite/persona score bars |
+| **Candidate Detail** | Individual profile breakdown: scores, trajectory, strengths/concerns, narrative |
+| **Audit Report** | Counterfactual bias audit results with delta comparison and flag rates |
+| **Pipeline Setup** | 3-step wizard: Upload JD → Upload Resumes → Configure & Run (with real-time progress) |
+| **Empty State** | Onboarding screen when no pipeline data exists |
 
 ### Running the Dashboard
 
-Ensure your virtual environment is active.
-
 #### 1. Start the Backend API Server
-From the project root directory, run:
 ```bash
+# From project root, with venv active
 uvicorn server:app --host 0.0.0.0 --port 8000 --reload
 ```
-The interactive API documentation is available at `http://localhost:8000/docs`.
+API docs: `http://localhost:8000/docs`
 
 #### 2. Start the Frontend Dev Server
-In a new terminal window:
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-The web dashboard is served at `http://localhost:5173/`. Requests to `/api/*` are proxied to the backend API automatically.
+Dashboard: `http://localhost:5173/` (proxies `/api/*` to backend automatically)
 
-## Running tests
+### API Endpoints
 
-```bash
-pytest
-```
+| Endpoint | Method | Description |
+|---|---|---|
+| `/api/candidates` | GET | All ranked candidates sorted by composite score |
+| `/api/candidates/{id}` | GET | Single candidate detail with full scoring breakdown |
+| `/api/audit` | GET | Bias audit report with flag rates and methodology |
+| `/api/job-description` | GET | Current job description |
+| `/api/pipeline/status` | GET | Pipeline running/completed/idle status |
+| `/api/run` | POST | Trigger a new pipeline run (background task) |
+| `/api/upload/resumes` | POST | Upload candidate files (replaces previous data) |
+| `/api/upload/job-description` | POST | Upload a job description file |
+| `/api/export/csv` | GET | Download `ranked_candidates.csv` |
 
-The suite mocks every Ollama call (via `unittest.mock.patch` on `ollama.chat`) and runs fully offline and deterministically, so no Ollama server or network access is required. Property-based tests use [Hypothesis](https://hypothesis.readthedocs.io/).
+---
 
-## Output files
+## 📊 Output Files
 
 Both artifacts are written to the `--output-dir` (default `./output/`).
 
 ### `ranked_candidates.csv`
 
-One header row plus exactly one row per scored candidate, with columns in this order:
+One row per scored candidate with 16 columns:
 
 | Column | Description |
-| --- | --- |
-| `rank` | Consecutive 1-based rank in descending composite-score order (ties broken by `candidate_id` ascending). |
-| `candidate_id` | Unique candidate identifier (`uuid4`, or `cf_<id>` for a counterfactual twin). |
-| `name` | Candidate name (defaults to `Unknown Candidate` when unresolved). |
-| `composite_score` | Weighted panel score on a 0–10 scale, rounded to 2 decimals. |
-| `trajectory_score` | The LLM-derived seniority score (0–10) from the trajectory vector. |
-| `hiring_manager_score` | Hiring-manager persona score (0–10). |
-| `peer_interviewer_score` | Peer-interviewer persona score (0–10). |
-| `devils_advocate_score` | Devil's-advocate persona score (0–10); subtracted in the composite. |
-| `panel_variance` | Population variance across the three persona scores. |
-| `requires_human_review` | `True` when `panel_variance` exceeds 2.5. |
-| `verdict_consensus` | The verdict held by at least two personas, else the hiring-manager's verdict. |
-| `strengths` | Pipe-separated list of de-duplicated strengths (empty list → empty string). |
-| `concerns` | Pipe-separated list of de-duplicated concerns (empty list → empty string). |
-| `narrative` | A three-sentence summary of the evaluation. |
-| `bias_flag` | `True` when the counterfactual delta exceeds 0.75. |
-| `counterfactual_delta` | Absolute difference between the candidate's and twin's composite scores (rounded to 2 decimals); empty when the audit was skipped or failed. |
+|---|---|
+| `rank` | 1-based rank, descending by composite score (ties broken by `candidate_id`) |
+| `candidate_id` | Unique UUID (`cf_<id>` for counterfactual twins) |
+| `name` | Candidate name |
+| `composite_score` | Weighted panel score, 0–10 scale |
+| `trajectory_score` | LLM-derived seniority score (0–10) |
+| `hiring_manager_score` | Hiring Manager persona score (0–10) |
+| `peer_interviewer_score` | Peer Interviewer persona score (0–10) |
+| `devils_advocate_score` | Devil's Advocate persona score (0–10), subtracted in composite |
+| `panel_variance` | Population variance across the three persona scores |
+| `requires_human_review` | `True` when `panel_variance > 2.5` |
+| `verdict_consensus` | Majority verdict of 3 personas; Hiring Manager breaks ties |
+| `strengths` | Pipe-separated de-duplicated strengths |
+| `concerns` | Pipe-separated de-duplicated concerns |
+| `narrative` | 3-sentence summary (strength, concern, confidence gap) |
+| `bias_flag` | `True` when counterfactual delta exceeds 0.75 |
+| `counterfactual_delta` | `|original − twin|` composite score difference |
 
 ### `bias_audit_report.json`
 
 | Field | Description |
-| --- | --- |
-| `total_candidates_audited` | Number of candidates whose twin was successfully re-scored. |
-| `flagged_count` | Number of audited candidates with `bias_flag = true`. |
-| `flag_rate` | `flagged_count / total_candidates_audited` (0 when nothing was audited). |
-| `bias_flag_threshold` | The delta threshold above which a candidate is flagged (`0.75`). |
-| `flagged_candidates` | Details for each flagged candidate (id, name, delta, original/cf scores). |
-| `clean_candidates_count` | Audited candidates that were not flagged. |
-| `methodology_note` | How twins are built and the caveat that a clean result is not proof of no bias. |
-| `audit_failures` | Entries for candidates whose twin could not be re-parsed/re-enriched/re-scored. |
-| `audit_skipped` | Present and `true` only when run with `--skip-audit`. |
+|---|---|
+| `total_candidates_audited` | Number of twins successfully re-scored |
+| `flagged_count` | Candidates with `bias_flag = true` |
+| `flag_rate` | `flagged / audited` ratio |
+| `bias_flag_threshold` | Delta threshold: `0.75` |
+| `flagged_candidates` | Details for each flagged candidate |
+| `methodology_note` | How twins are built; caveat that clean ≠ unbiased |
+| `audit_failures` | Entries for candidates whose twin processing failed |
 
-## Using your own data
+---
 
-### Candidates (`--candidates-dir`)
+## 🧪 Testing
 
-Point `--candidates-dir` at a directory of resume files. Supported extensions:
+```bash
+pytest tests/ -v
+```
 
-- **`.json`** — loaded directly as a `CandidateProfile` (no LLM call).
-- **`.pdf` / `.docx`** — text is extracted (PyMuPDF / python-docx) and parsed into a `CandidateProfile` by the LLM.
+The suite includes **76 tests** covering INGEST, EMBED, and SCORE phases. All Ollama calls are mocked — no server or network required. Property-based tests use [Hypothesis](https://hypothesis.readthedocs.io/).
 
-If the directory is missing or contains no candidate files, the pipeline falls back to `data/sample_candidates.json`.
+---
 
-A candidate `.json` file matches the `CandidateProfile` schema:
+## 🛠 Technology Stack
+
+| Layer | Technology | Purpose |
+|---|---|---|
+| **LLM Inference** | Ollama (5 models) | Local inference for parsing, scoring, enrichment |
+| **Embeddings** | sentence-transformers (`bge-large-en-v1.5`) | Semantic text embeddings (1024-dim) |
+| **Vector Store** | ChromaDB (PersistentClient) | RAG retrieval for JD context & calibration |
+| **Data Models** | Pydantic v2 | Schema validation for candidates & job descriptions |
+| **Resume Parsing** | PyMuPDF, python-docx | PDF/DOCX text extraction |
+| **NLP Fallback** | spaCy (`en_core_web_sm`) | Name/email recovery from unstructured text |
+| **Output** | pandas | CSV serialization |
+| **Backend API** | FastAPI + Uvicorn | REST API serving dashboard data |
+| **Frontend** | React 18 + Vite + TypeScript | Interactive dashboard UI |
+| **Styling** | Tailwind CSS v4 | Material Design 3 inspired design system |
+| **Testing** | pytest + Hypothesis | Unit + property-based testing (76 tests) |
+
+---
+
+## 📈 Data Flow Diagram
+
+```
+INPUT                       PIPELINE                              OUTPUT
+─────                       ────────                              ──────
+
+ Resumes (.json/.pdf/.docx)
+         │                  ┌──────────┐
+         ├─────────────────▶│  INGEST  │──▶ CandidateProfile[]
+         │                  │(qwen2.5) │           │
+ Job Description            └──────────┘           │
+ (.json/.txt)  ─────────────▶ JD Parser            │
+                            ──▶ JobDescription      │
+                                                    ▼
+                                            ┌──────────┐
+                                            │  ENRICH  │
+                                            │(deepseek)│
+                                            └────┬─────┘
+                                                 │
+                                    CandidateProfile[] + TrajectoryVector
+                                                 │
+                                                 ▼
+                                         ┌─────────────┐
+                                         │ EMBED/STORE │
+                                         │ (bge-large) │
+                                         └──────┬──────┘
+                                                │
+                                     ┌──────────┼──────────┐
+                                     ▼          ▼          ▼
+                                ChromaDB    ChromaDB    ChromaDB
+                               (JD reqs) (candidates) (calibration)
+                                     │          │          │
+                                     └──────────┼──────────┘
+                                                ▼
+                                          ┌──────────┐
+                                          │  SCORE   │
+                                          │ 3 models │
+                                          │ 3 pers.  │
+                                          └────┬─────┘
+                                               │
+                                        ScoredResult[]
+                                               │
+                                     ┌─────────┴─────────┐
+                                     ▼                   ▼
+                               ┌──────────┐        ┌──────────┐
+                               │  AUDIT   │        │  OUTPUT  │
+                               │(cf twins)│        │(rank+csv)│
+                               └────┬─────┘        └────┬─────┘
+                                    │                    │
+                                    ▼                    ▼
+                          bias_audit_report.json   ranked_candidates.csv
+                                    │                    │
+                                    └────────┬───────────┘
+                                             ▼
+                                     FastAPI (server.py)
+                                             │
+                                             ▼
+                                   React Dashboard (Vite)
+```
+
+---
+
+## 📝 Using Your Own Data
+
+### Candidate Files (`--candidates-dir`)
+
+Place resume files in a directory. Supported formats:
+
+| Format | Processing |
+|---|---|
+| `.json` | Loaded directly as `CandidateProfile` (no LLM call) |
+| `.pdf` | Text extracted via PyMuPDF → LLM parsing → `CandidateProfile` |
+| `.docx` | Text extracted via python-docx → LLM parsing → `CandidateProfile` |
+
+If the directory is missing or empty, the pipeline falls back to `data/sample_candidates.json`.
+
+<details>
+<summary>Example <code>CandidateProfile</code> JSON</summary>
 
 ```json
 {
@@ -211,50 +604,79 @@ A candidate `.json` file matches the `CandidateProfile` schema:
   "education": [
     {"institution": "Stanford University", "degree": "B.S. Computer Science", "year": 2016}
   ],
-  "raw_text": "Sofia Ramirez is a senior software engineer with eight years...",
+  "raw_text": "Sofia Ramirez is a senior software engineer...",
   "source_file": "sofia_ramirez.json"
 }
 ```
 
-Only `candidate_id` is strictly required; every other field has a sensible default, so partial profiles still validate.
+Only `candidate_id` is required; all other fields have sensible defaults.
+</details>
 
-### Job description (`--job-description`)
+### Job Description (`--job-description`)
 
-- **`.json`** — loaded directly as a `JobDescription` (no LLM call).
-- **`.txt`** — classified into requirement buckets and dimensions by the LLM.
+| Format | Processing |
+|---|---|
+| `.json` | Loaded directly as `JobDescription` (no LLM call) |
+| `.txt` | Classified into requirement buckets by the LLM |
 
-A job description `.json` file matches the `JobDescription` schema:
+<details>
+<summary>Example <code>JobDescription</code> JSON</summary>
 
 ```json
 {
   "job_id": "6f9619ff-8b86-5d11-b42d-00cf4fc964ff",
   "title": "Senior Software Engineer",
   "company": "Northwind Systems",
-  "raw_text": "Northwind Systems is a Series B SaaS company hiring a Senior Software Engineer...",
+  "raw_text": "Northwind Systems is hiring a Senior Software Engineer...",
   "requirements": [
-    {"text": "4+ years of hands-on Python development", "bucket": "must_have", "dimension": "technical"},
+    {"text": "4+ years Python development", "bucket": "must_have", "dimension": "technical"},
     {"text": "Experience with Kubernetes", "bucket": "nice_to_have", "dimension": "technical"},
-    {"text": "Thrives in an async-first environment", "bucket": "culture_signal", "dimension": "soft_skill"},
+    {"text": "Thrives in async-first environment", "bucket": "culture_signal", "dimension": "soft_skill"},
     {"text": "Experience mentoring junior engineers", "bucket": "seniority_marker", "dimension": "soft_skill"}
   ]
 }
 ```
 
-Each requirement `bucket` is one of `must_have`, `nice_to_have`, `culture_signal`, `seniority_marker`; each `dimension` is one of `technical`, `soft_skill`, `domain`, `experience_level`.
+Requirement buckets: `must_have`, `nice_to_have`, `culture_signal`, `seniority_marker`
+Dimensions: `technical`, `soft_skill`, `domain`, `experience_level`
+</details>
 
-## Performance note
+---
 
-Everything runs on CPU with `llama3.2:3b`, so runtime is dominated by the number of LLM calls. For the bundled 15-candidate dataset:
+## ⚡ Performance
 
-- **Scoring** makes ~4 LLM calls per candidate (3 evaluator personas + 1 narrative), plus 1 seniority call per candidate during enrichment.
-- **The audit** roughly doubles the LLM work, because it re-scores a counterfactual twin for each candidate.
+Everything runs on CPU by default. For the bundled 15-candidate dataset:
 
-On a CPU-only machine this lands on the order of several minutes for 15 candidates — a realistic ballpark is **~3–10 minutes** depending on hardware. Running with `--skip-audit` cuts the LLM work roughly in half. Remember that the embedding model (`BAAI/bge-large-en-v1.5`, ~1.3GB) downloads on the first run.
+| Phase | Duration | LLM Calls |
+|---|---|---|
+| Startup + Ingest | ~1 sec | 0 (JSON direct load) |
+| Embed & Store | ~4 min | 0 (embedding model only) |
+| Enrich Candidates | ~18 min | 3 per candidate (seniority scoring) |
+| Score | ~1 hr 43 min | ~4 per candidate (3 personas + narrative) |
+| Fairness Audit | ~34 min | Re-parse + re-enrich + re-score per twin |
+| **Total** | **~2 hr 41 min** | ~150+ LLM calls |
 
-## Methodology
+> **Speed tips:**
+> - `--skip-audit` cuts LLM work by ~50%
+> - GPU acceleration via Ollama dramatically reduces inference time
+> - `LOW_MEMORY_MODE` swaps to lighter models that run faster on constrained hardware
 
-See [methodology.md](./methodology.md) for the detailed methodology behind ingestion, trajectory enrichment, embedding and RAG, multi-persona scoring, the composite/variance math, the counterfactual audit, and reproducibility.
+---
 
-## Alternative backend: Groq free tier
+## 📚 Further Reading
 
-The system is designed so the only swap seam for the LLM is the `OllamaClient` call implementation. Per Requirement 1.11, you can switch to the [Groq](https://groq.com/) free tier with `llama-3.1-70b` by changing **only** the `OllamaClient` LLM call implementation and the dependency manifest (`requirements.txt`). The Resume Parser, JD Parser, TrajectoryEnricher, VectorStoreManager, CandidateScoringPipeline, CounterfactualAuditor, and CLI all stay unchanged.
+- [**methodology.md**](./methodology.md) — Detailed methodology: ingestion, trajectory enrichment, RAG design, multi-persona scoring math, counterfactual audit, and reproducibility
+- [**ARCHITECTURE.md**](./ARCHITECTURE.md) — In-depth architecture guide with data models, pipeline internals, and component relationships
+
+---
+
+## 🔄 Alternative Backend: Groq Free Tier
+
+The LLM swap seam is isolated in `OllamaClient`. You can switch to [Groq](https://groq.com/) free tier with `llama-3.1-70b` by changing **only** the client implementation and `requirements.txt`. All pipeline components — parsers, enrichers, scorers, auditor, and CLI — remain unchanged.
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](./LICENSE).
+]]>
