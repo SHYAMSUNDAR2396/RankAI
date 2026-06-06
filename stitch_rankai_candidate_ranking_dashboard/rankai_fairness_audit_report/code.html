@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fairness Audit Report - RankAI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#ffb4a8",
+                        "surface-container": "#ebefeb",
+                        "secondary-fixed": "#dee2f7",
+                        "error-container": "#ffdad6",
+                        "on-surface": "#181d1a",
+                        "surface-container-high": "#e5e9e5",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#eef2ee",
+                        "primary-fixed-dim": "#84d6b9",
+                        "inverse-surface": "#2d312f",
+                        "on-tertiary-fixed": "#3b0804",
+                        "tertiary-container": "#954c41",
+                        "outline": "#6f7a74",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#9aedcf",
+                        "tertiary-fixed": "#ffdad4",
+                        "surface-dim": "#d7dbd7",
+                        "surface-container-low": "#f1f4f1",
+                        "background": "#f7faf6",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed": "#002117",
+                        "surface-bright": "#f7faf6",
+                        "surface": "#f7faf6",
+                        "secondary-fixed-dim": "#c1c6da",
+                        "tertiary": "#78352b",
+                        "on-tertiary-fixed-variant": "#743329",
+                        "surface-container-highest": "#e0e3e0",
+                        "error": "#ba1a1a",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-container": "#0f6e56",
+                        "outline-variant": "#bec9c3",
+                        "surface-tint": "#086b53",
+                        "on-background": "#181d1a",
+                        "primary": "#005440",
+                        "on-surface-variant": "#3f4944",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed": "#a0f3d4",
+                        "on-secondary-container": "#5d6274",
+                        "secondary-container": "#dbdff4",
+                        "on-tertiary-container": "#ffd3cc",
+                        "on-secondary-fixed-variant": "#414657",
+                        "inverse-primary": "#84d6b9",
+                        "secondary": "#595e6f",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e0e3e0",
+                        "on-secondary-fixed": "#161b2a",
+                        "on-primary-fixed-variant": "#00513e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "stack_sm": "0.5rem",
+                        "sidebar_width": "220px",
+                        "gutter": "1.5rem",
+                        "margin_desktop": "2rem",
+                        "stack_lg": "1.5rem",
+                        "stack_md": "1rem",
+                        "margin_mobile": "1rem"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #F8F7F4; color: #1A1F2E; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0; }
+        .material-symbols-outlined.fill { font-variation-settings: 'FILL' 1; }
+        .card-border { border: 1px solid #E8E6E1; }
+        .row-hover:hover { background-color: #F1EFED; }
+        .row-hover:hover .left-accent { opacity: 1; }
+    </style>
+</head>
+<body class="font-body-md text-body-md bg-background antialiased flex h-screen overflow-hidden">
+<!-- SideNavBar -->
+<nav class="bg-inverse-surface dark:bg-inverse-surface fixed left-0 top-0 h-screen w-[220px] flex flex-col justify-between py-6 z-20">
+<div>
+<div class="px-6 mb-8 flex items-center gap-3">
+<div aria-label="RankAI Logo" class="w-8 h-8 rounded bg-primary-fixed flex items-center justify-center text-inverse-surface font-bold text-lg">R</div>
+<div>
+<h1 class="text-headline-sm font-headline-sm font-bold text-primary-fixed">RankAI</h1>
+<p class="text-label-sm font-label-sm text-primary-fixed-dim opacity-80">AI Talent Acquisition</p>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<a class="text-on-surface-variant dark:text-on-secondary-fixed-variant py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 hover:text-primary-fixed transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="text-on-surface-variant dark:text-on-secondary-fixed-variant py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 hover:text-primary-fixed transition-colors" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span>Candidates</span>
+</a>
+<a class="text-on-surface-variant dark:text-on-secondary-fixed-variant py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 hover:text-primary-fixed transition-colors" href="#">
+<span class="material-symbols-outlined">work</span>
+<span>Job Roles</span>
+</a>
+<a class="bg-primary-container/20 text-primary-fixed border-l-4 border-primary-fixed font-bold py-3 px-4 flex items-center gap-3 opacity-90 transition-opacity duration-150" href="#">
+<span class="material-symbols-outlined fill" style="font-variation-settings: 'FILL' 1;">description</span>
+<span>Audit Report</span>
+</a>
+<a class="text-on-surface-variant dark:text-on-secondary-fixed-variant py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 hover:text-primary-fixed transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</a>
+</div>
+</div>
+<div class="px-4">
+<a class="text-on-surface-variant dark:text-on-secondary-fixed-variant py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 hover:text-primary-fixed transition-colors" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<span>Aisha Patel</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex flex-col w-full h-full ml-[220px]">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface full-width top-0 sticky border-b border-outline-variant dark:border-outline z-10">
+<div class="flex justify-between items-center w-full px-margin_desktop py-stack_md">
+<div class="hidden text-primary dark:text-primary-fixed font-headline-md text-headline-md font-bold">RankAI</div>
+<div class="flex items-center gap-4 ml-auto">
+<button class="bg-transparent border border-primary-container text-primary-container hover:bg-surface-container-low transition-colors px-4 py-2 rounded font-label-md text-label-md active:scale-95 transition-transform">Export CSV</button>
+<button class="bg-primary-container text-on-primary hover:bg-surface-tint transition-colors px-4 py-2 rounded font-label-md text-label-md active:scale-95 transition-transform">Run New Pipeline</button>
+</div>
+</div>
+</header>
+<!-- Scrollable Canvas -->
+<main class="flex-1 overflow-y-auto p-margin_desktop">
+<!-- Header Section -->
+<div class="mb-stack_lg">
+<h2 class="text-headline-md font-headline-md font-bold text-[#1A1F2E] mb-2">Fairness Audit Report</h2>
+<p class="text-body-md font-body-md text-on-surface-variant">Senior Software Engineer pipeline · Run 30 May 2025 · 15 candidates</p>
+</div>
+<!-- Summary Cards -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter mb-stack_lg">
+<div class="bg-surface-container-lowest card-border rounded-lg p-4">
+<p class="text-label-md font-label-md text-on-surface-variant uppercase mb-2">Candidates Audited</p>
+<p class="text-display-lg font-display-lg text-[#1A1F2E]">15</p>
+</div>
+<div class="bg-surface-container-lowest card-border rounded-lg p-4">
+<p class="text-label-md font-label-md text-on-surface-variant uppercase mb-2">Bias Flags Raised</p>
+<p class="text-display-lg font-display-lg text-[#ba1a1a]">2</p>
+</div>
+<div class="bg-surface-container-lowest card-border rounded-lg p-4">
+<p class="text-label-md font-label-md text-on-surface-variant uppercase mb-2">Clean Results</p>
+<p class="text-display-lg font-display-lg text-primary-container">13</p>
+</div>
+<div class="bg-surface-container-lowest card-border rounded-lg p-4">
+<p class="text-label-md font-label-md text-on-surface-variant uppercase mb-2">Flag Rate</p>
+<p class="text-display-lg font-display-lg text-[#954c41]">13.3%</p>
+</div>
+</div>
+<!-- Two Column Layout -->
+<div class="flex flex-col lg:flex-row gap-gutter">
+<!-- Left Column (60%) -->
+<div class="w-full lg:w-[60%] flex flex-col gap-stack_lg">
+<!-- Flagged Candidates Table -->
+<div class="bg-surface-container-lowest card-border rounded-lg overflow-hidden flex flex-col">
+<div class="p-4 border-b border-[#E8E6E1]">
+<h3 class="text-headline-sm font-headline-sm font-semibold text-[#1A1F2E]">Flagged Candidates</h3>
+</div>
+<div class="w-full overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-[#E8E6E1] text-[#1A1F2E] text-label-md font-label-md uppercase bg-background">
+<th class="p-4 font-semibold w-1"></th>
+<th class="p-4 font-semibold">Candidate</th>
+<th class="p-4 font-semibold">Original Score</th>
+<th class="p-4 font-semibold">CF Score</th>
+<th class="p-4 font-semibold">Delta</th>
+<th class="p-4 font-semibold">Status</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-b border-[#E8E6E1] relative row-hover group">
+<td class="w-1 p-0 absolute top-0 left-0 bottom-0"><div class="left-accent bg-error w-1 h-full opacity-0 transition-opacity"></div></td>
+<td class="p-4 text-body-md font-body-md font-medium text-[#1A1F2E]">Daniel Park</td>
+<td class="p-4 text-body-md font-body-md text-on-surface-variant">88.5</td>
+<td class="p-4 text-body-md font-body-md text-on-surface-variant">87.59</td>
+<td class="p-4">
+<div class="flex items-center gap-2">
+<span class="text-body-md font-body-md font-medium text-[#ba1a1a]">0.91</span>
+<div class="w-16 h-1.5 bg-surface-variant rounded-full overflow-hidden">
+<div class="bg-[#ba1a1a] h-full" style="width: 91%;"></div>
+</div>
+</div>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2 py-1 rounded bg-error-container text-on-error-container text-label-sm font-label-sm font-semibold uppercase">Flagged</span>
+</td>
+</tr>
+<tr class="border-b border-[#E8E6E1] relative row-hover group bg-[#F1EFED]">
+<td class="w-1 p-0 absolute top-0 left-0 bottom-0"><div class="left-accent bg-error w-1 h-full opacity-0 transition-opacity"></div></td>
+<td class="p-4 text-body-md font-body-md font-medium text-[#1A1F2E]">Tom White</td>
+<td class="p-4 text-body-md font-body-md text-on-surface-variant">92.0</td>
+<td class="p-4 text-body-md font-body-md text-on-surface-variant">91.22</td>
+<td class="p-4">
+<div class="flex items-center gap-2">
+<span class="text-body-md font-body-md font-medium text-[#ba1a1a]">0.78</span>
+<div class="w-16 h-1.5 bg-surface-variant rounded-full overflow-hidden">
+<div class="bg-[#ba1a1a] h-full" style="width: 78%;"></div>
+</div>
+</div>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2 py-1 rounded bg-error-container text-on-error-container text-label-sm font-label-sm font-semibold uppercase">Flagged</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 bg-[#fff8e1] border-t border-[#E8E6E1]">
+<p class="text-body-md font-body-md text-[#78352b] flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">info</span>
+                                Candidates highlighted above showed a scoring delta &gt; 0.75 across counterfactual variations, indicating potential bias in evaluation. Manual review required.
+                            </p>
+</div>
+</div>
+<!-- Clean Candidates (Collapsed) -->
+<button class="w-full bg-surface-container-lowest card-border rounded-lg p-4 flex justify-between items-center hover:bg-surface-container-low transition-colors">
+<span class="text-headline-sm font-headline-sm font-semibold text-[#1A1F2E]">Clean Candidates (13)</span>
+<span class="material-symbols-outlined text-on-surface-variant">expand_more</span>
+</button>
+</div>
+<!-- Right Column (38%) -->
+<div class="w-full lg:w-[38%] flex flex-col gap-stack_lg">
+<!-- What was tested Card -->
+<div class="bg-surface-container-lowest card-border rounded-lg p-5">
+<h3 class="text-headline-sm font-headline-sm font-semibold text-[#1A1F2E] mb-4">What was tested</h3>
+<div class="flex flex-col gap-3">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary-container">check_circle</span>
+<span class="text-body-md font-body-md text-[#1A1F2E]">Name Swaps</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary-container">check_circle</span>
+<span class="text-body-md font-body-md text-[#1A1F2E]">Pronoun Variations</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary-container">check_circle</span>
+<span class="text-body-md font-body-md text-[#1A1F2E]">Institution Masking</span>
+</div>
+</div>
+</div>
+<!-- Threshold Indicator Card -->
+<div class="bg-surface-container-lowest card-border rounded-lg p-5">
+<h3 class="text-headline-sm font-headline-sm font-semibold text-[#1A1F2E] mb-6">Threshold Analysis</h3>
+<div class="relative pt-6 pb-2">
+<!-- Axis -->
+<div class="h-1 bg-gradient-to-r from-primary-fixed-dim via-surface-variant to-error-container rounded-full w-full"></div>
+<!-- Threshold Line -->
+<div class="absolute top-2 bottom-0 w-px bg-outline border-r border-dashed border-outline" style="left: 75%;"></div>
+<span class="absolute top-0 text-label-sm font-label-sm text-outline transform -translate-x-1/2" style="left: 75%;">0.75 Limit</span>
+<!-- Data Points -->
+<div class="absolute top-1/2 w-4 h-4 rounded-full bg-[#0F6E56] border-2 border-surface-container-lowest transform -translate-x-1/2 -translate-y-1/2 group" style="left: 31%;">
+<div class="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-inverse-surface text-inverse-on-surface text-label-sm font-label-sm px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
+                                    Sofia Ramirez (0.31)
+                                </div>
+</div>
+<div class="absolute top-1/2 w-4 h-4 rounded-full bg-[#ba1a1a] border-2 border-surface-container-lowest transform -translate-x-1/2 -translate-y-1/2 group" style="left: 91%;">
+<div class="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-inverse-surface text-inverse-on-surface text-label-sm font-label-sm px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
+                                    Daniel Park (0.91)
+                                </div>
+</div>
+</div>
+<div class="flex justify-between mt-4 text-label-md font-label-md text-on-surface-variant uppercase">
+<span>Safe Zone</span>
+<span>Review Zone</span>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex gap-4 mt-auto pt-4">
+<button class="flex-1 bg-transparent border border-primary-container text-primary-container hover:bg-surface-container-low transition-colors px-4 py-3 rounded font-label-md text-label-md text-center active:scale-95 transition-transform">Download Full Report (JSON)</button>
+<button class="flex-1 bg-primary-container text-on-primary hover:bg-surface-tint transition-colors px-4 py-3 rounded font-label-md text-label-md text-center active:scale-95 transition-transform">Re-run Audit</button>
+</div>
+</div>
+</div>
+<div class="h-stack_lg w-full"></div> <!-- Bottom padding -->
+</main>
+</div>
+</body></html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RankAI - Onboarding</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#d7dbd7",
+                        "primary-fixed": "#a0f3d4",
+                        "inverse-primary": "#84d6b9",
+                        "secondary": "#595e6f",
+                        "on-tertiary-fixed": "#3b0804",
+                        "inverse-surface": "#2d312f",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#00513e",
+                        "primary-container": "#0f6e56",
+                        "on-secondary-fixed": "#161b2a",
+                        "primary": "#005440",
+                        "surface-container": "#ebefeb",
+                        "outline-variant": "#bec9c3",
+                        "secondary-fixed-dim": "#c1c6da",
+                        "inverse-on-surface": "#eef2ee",
+                        "on-surface": "#181d1a",
+                        "surface-container-low": "#f1f4f1",
+                        "secondary-fixed": "#dee2f7",
+                        "on-tertiary-fixed-variant": "#743329",
+                        "on-secondary-fixed-variant": "#414657",
+                        "surface-container-highest": "#e0e3e0",
+                        "background": "#f7faf6",
+                        "on-background": "#181d1a",
+                        "surface-bright": "#f7faf6",
+                        "outline": "#6f7a74",
+                        "on-secondary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-primary-container": "#9aedcf",
+                        "error": "#ba1a1a",
+                        "on-secondary-container": "#5d6274",
+                        "on-primary-fixed": "#002117",
+                        "tertiary": "#78352b",
+                        "on-tertiary-container": "#ffd3cc",
+                        "error-container": "#ffdad6",
+                        "secondary-container": "#dbdff4",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#f7faf6",
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#954c41",
+                        "surface-variant": "#e0e3e0",
+                        "surface-container-high": "#e5e9e5",
+                        "primary-fixed-dim": "#84d6b9",
+                        "surface-tint": "#086b53",
+                        "tertiary-fixed": "#ffdad4",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb4a8",
+                        "on-surface-variant": "#3f4944"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "1.5rem",
+                        "stack_sm": "0.5rem",
+                        "stack_md": "1rem",
+                        "sidebar_width": "220px",
+                        "margin_desktop": "2rem",
+                        "margin_mobile": "1rem",
+                        "stack_lg": "1.5rem"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "label-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex antialiased">
+<!-- Fixed Left Sidebar (SideNavBar) -->
+<aside class="bg-inverse-surface fixed left-0 top-0 h-screen w-[220px] flex flex-col h-full justify-between py-6 z-20 hidden md:flex">
+<div>
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary-container flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm text-primary-fixed">RankAI</h1>
+<p class="font-label-sm text-label-sm text-secondary-fixed-dim">AI Talent Acquisition</p>
+</div>
+</div>
+<nav class="flex flex-col gap-1">
+<!-- All inactive for onboarding -->
+<a class="text-on-surface-variant py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 hover:text-primary-fixed transition-colors text-body-md font-body-md" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                    Dashboard
+                </a>
+<a class="text-on-surface-variant py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 hover:text-primary-fixed transition-colors text-body-md font-body-md" href="#">
+<span class="material-symbols-outlined">groups</span>
+                    Candidates
+                </a>
+<a class="text-on-surface-variant py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 hover:text-primary-fixed transition-colors text-body-md font-body-md" href="#">
+<span class="material-symbols-outlined">work</span>
+                    Job Roles
+                </a>
+<a class="text-on-surface-variant py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 hover:text-primary-fixed transition-colors text-body-md font-body-md" href="#">
+<span class="material-symbols-outlined">description</span>
+                    Audit Report
+                </a>
+<a class="text-on-surface-variant py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 hover:text-primary-fixed transition-colors text-body-md font-body-md" href="#">
+<span class="material-symbols-outlined">settings</span>
+                    Settings
+                </a>
+</nav>
+</div>
+<div class="px-4 mt-auto">
+<a class="text-on-surface-variant py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 hover:text-primary-fixed transition-colors text-body-md font-body-md border-t border-outline/20 pt-4" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+                Aisha Patel
+            </a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-[0px] md:ml-[220px] flex items-center justify-center p-margin_mobile md:p-margin_desktop bg-[#F8F7F4] min-h-screen">
+<!-- Onboarding Card -->
+<div class="w-full max-w-[520px] bg-surface-container-lowest border border-[#E8E6E1] rounded-xl p-8 md:p-10 flex flex-col items-center text-center">
+<!-- Illustration -->
+<div class="mb-8 w-40 h-40 flex items-center justify-center">
+<img alt="" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAClIltraU9VtNWQ1poD6lIps0Sc04g2cP_a5NtRjlxUfudG8B136BviuE-JRMUr-5PGGmkm54bn8D52zdCv6WiPRD56d6y9_fLNqoq_iAdX2R-uATrrxIRNEXvUxt67aXoF_h2W0_btjdl1QpcIzHgMvya89AT407TVZya91RutjeM_0Hb8c-XJl4zqy40Y1xBSkOWSYUP_Z954kybI27NqarRsgtwU7cmizY4TGsgWrmewy2pwOfp9MXA0NH6HzxUbr9aZP3DU4w"/>
+</div>
+<!-- Heading & Subtext -->
+<h2 class="font-headline-md text-headline-md text-[#1A1F2E] mb-4">No candidates ranked yet</h2>
+<p class="font-body-lg text-body-lg text-secondary mb-10 max-w-md">
+                Add a job description and upload your candidate files to run your first AI-powered ranking pipeline. Results appear here in minutes.
+            </p>
+<!-- Action Buttons -->
+<div class="w-full flex flex-col gap-4 mb-12">
+<button class="w-full bg-[#0F6E56] hover:bg-[#086b53] text-on-primary font-label-md text-label-md py-4 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm">
+                    Run Your First Pipeline
+                    <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+<button class="w-full bg-transparent border-2 border-[#0F6E56] text-[#0F6E56] hover:bg-primary-container/5 font-label-md text-label-md py-3.5 px-6 rounded-lg transition-colors flex items-center justify-center">
+                    Load Sample Data
+                </button>
+</div>
+<!-- Feature Hints Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full border-t border-[#E8E6E1] pt-8">
+<div class="flex flex-col items-center sm:items-start text-center sm:text-left gap-2">
+<div class="w-8 h-8 rounded bg-surface-container-low flex items-center justify-center text-primary-container mb-1">
+<span class="material-symbols-outlined text-[18px]">shield</span>
+</div>
+<h3 class="font-label-md text-label-md text-on-surface">Privacy-first</h3>
+<p class="font-body-md text-body-md text-secondary text-xs leading-tight">Runs locally on your secure infrastructure</p>
+</div>
+<div class="flex flex-col items-center sm:items-start text-center sm:text-left gap-2">
+<div class="w-8 h-8 rounded bg-surface-container-low flex items-center justify-center text-primary-container mb-1">
+<span class="material-symbols-outlined text-[18px]">memory</span>
+</div>
+<h3 class="font-label-md text-label-md text-on-surface">Powered by AI</h3>
+<p class="font-body-md text-body-md text-secondary text-xs leading-tight">Utilizing Llama 3.2 for precise matching</p>
+</div>
+<div class="flex flex-col items-center sm:items-start text-center sm:text-left gap-2">
+<div class="w-8 h-8 rounded bg-surface-container-low flex items-center justify-center text-primary-container mb-1">
+<span class="material-symbols-outlined text-[18px]">insert_chart</span>
+</div>
+<h3 class="font-label-md text-label-md text-on-surface">Fairness Audit</h3>
+<p class="font-body-md text-body-md text-secondary text-xs leading-tight">Built-in bias detection and reporting</p>
+</div>
+</div>
+</div>
+</main>
+</body></html>

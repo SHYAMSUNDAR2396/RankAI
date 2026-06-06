@@ -1,0 +1,277 @@
+@import "tailwindcss";
+
+/* ── Design Tokens (from mockup Tailwind config) ── */
+@theme {
+  --color-surface: #f7faf6;
+  --color-surface-dim: #d7dbd7;
+  --color-surface-bright: #f7faf6;
+  --color-surface-container: #ebefeb;
+  --color-surface-container-low: #f1f4f1;
+  --color-surface-container-high: #e5e9e5;
+  --color-surface-container-highest: #e0e3e0;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-variant: #e0e3e0;
+  --color-surface-tint: #086b53;
+  --color-background: #F8F7F4;
+
+  --color-on-surface: #181d1a;
+  --color-on-surface-variant: #3f4944;
+  --color-on-background: #181d1a;
+
+  --color-primary: #0F6E56;
+  --color-primary-container: #0f6e56;
+  --color-primary-fixed: #a0f3d4;
+  --color-primary-fixed-dim: #84d6b9;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #9aedcf;
+  --color-on-primary-fixed: #002117;
+  --color-on-primary-fixed-variant: #00513e;
+
+  --color-secondary: #595e6f;
+  --color-secondary-container: #dbdff4;
+  --color-secondary-fixed: #dee2f7;
+  --color-secondary-fixed-dim: #c1c6da;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #5d6274;
+  --color-on-secondary-fixed: #161b2a;
+  --color-on-secondary-fixed-variant: #414657;
+
+  --color-tertiary: #78352b;
+  --color-tertiary-container: #954c41;
+  --color-tertiary-fixed: #ffdad4;
+  --color-tertiary-fixed-dim: #ffb4a8;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #ffd3cc;
+  --color-on-tertiary-fixed: #3b0804;
+  --color-on-tertiary-fixed-variant: #743329;
+
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #93000a;
+
+  --color-outline: #6f7a74;
+  --color-outline-variant: #bec9c3;
+
+  --color-inverse-surface: #1A1F2E;
+  --color-inverse-on-surface: #eef2ee;
+  --color-inverse-primary: #84d6b9;
+
+  /* Custom specific colors */
+  --color-req-amber: #F59E0B;
+  --color-req-red: #EF4444;
+  --color-req-teal: #0F6E56;
+  --color-navy: #1A1F2E;
+  --color-row-alt: #F1EFED;
+  --color-card-border: #E8E6E1;
+
+  /* Spacing tokens */
+  --spacing-sidebar: 220px;
+  --spacing-gutter: 1.5rem;
+  --spacing-stack-sm: 0.5rem;
+  --spacing-stack-md: 1rem;
+  --spacing-stack-lg: 1.5rem;
+  --spacing-margin-desktop: 2rem;
+  --spacing-margin-mobile: 1rem;
+
+  /* Font family */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ── Global Styles ── */
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-background);
+  color: var(--color-on-surface);
+  font-size: 14px;
+  line-height: 20px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* ── Typography Utilities ── */
+.text-display-lg {
+  font-size: 32px;
+  line-height: 40px;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+
+.text-headline-md {
+  font-size: 24px;
+  line-height: 32px;
+  letter-spacing: -0.01em;
+  font-weight: 600;
+}
+
+.text-headline-sm {
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 600;
+}
+
+.text-body-lg {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+}
+
+.text-body-md {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+}
+
+.text-label-md {
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.02em;
+  font-weight: 600;
+}
+
+.text-label-sm {
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 500;
+}
+
+/* ── Material Symbols ── */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0;
+  font-size: 24px;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+.material-symbols-outlined.fill {
+  font-variation-settings: 'FILL' 1;
+}
+
+/* ── Card Style ── */
+.card {
+  background-color: var(--color-surface-container-lowest);
+  border: 1px solid var(--color-card-border);
+  border-radius: 0.5rem;
+}
+
+/* ── Progress Bars ── */
+.progress-bar {
+  height: 4px;
+  border-radius: 9999px;
+  background-color: var(--color-surface-variant);
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Scrollbar Styling ── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-outline-variant);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-outline);
+}
+
+/* ── Transitions ── */
+.transition-default {
+  transition: all 0.15s ease-in-out;
+}
+
+/* ── Badge Utilities ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 500;
+}
+
+.badge-strong-yes {
+  background-color: var(--color-primary-container);
+  color: var(--color-on-primary);
+}
+
+.badge-yes {
+  background-color: var(--color-primary-fixed-dim);
+  color: var(--color-on-primary-fixed-variant);
+}
+
+.badge-maybe {
+  background-color: var(--color-req-amber);
+  color: var(--color-on-surface);
+}
+
+.badge-no {
+  background-color: var(--color-error);
+  color: var(--color-on-error);
+}
+
+.badge-flagged {
+  background-color: var(--color-error-container);
+  color: var(--color-on-error-container);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* ── Table Row Hover ── */
+.table-row-hover {
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  border-left: 4px solid transparent;
+}
+
+.table-row-hover:hover {
+  background-color: var(--color-row-alt) !important;
+  border-left-color: var(--color-primary-container);
+}
+
+/* ── Fade-in animation ── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeInUp 0.4s ease-out forwards;
+}
+
+.animate-fade-in-delay-1 { animation-delay: 0.05s; }
+.animate-fade-in-delay-2 { animation-delay: 0.1s; }
+.animate-fade-in-delay-3 { animation-delay: 0.15s; }
+.animate-fade-in-delay-4 { animation-delay: 0.2s; }
+
+/* ── Pulse animation for loading ── */
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}

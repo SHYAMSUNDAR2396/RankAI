@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RankAI - Run New Pipeline</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-dim": "#d7dbd7",
+                    "error": "#ba1a1a",
+                    "secondary": "#595e6f",
+                    "surface-bright": "#f7faf6",
+                    "on-secondary-fixed": "#161b2a",
+                    "surface-container-high": "#e5e9e5",
+                    "on-secondary-container": "#5d6274",
+                    "secondary-fixed-dim": "#c1c6da",
+                    "outline": "#6f7a74",
+                    "on-tertiary-fixed-variant": "#743329",
+                    "on-error-container": "#93000a",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-container": "#dbdff4",
+                    "inverse-primary": "#84d6b9",
+                    "error-container": "#ffdad6",
+                    "primary-fixed": "#a0f3d4",
+                    "on-primary-fixed-variant": "#00513e",
+                    "on-primary-fixed": "#002117",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-fixed-variant": "#414657",
+                    "surface-variant": "#e0e3e0",
+                    "primary": "#005440",
+                    "on-primary-container": "#9aedcf",
+                    "on-error": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "surface-container-highest": "#e0e3e0",
+                    "surface-container-low": "#f1f4f1",
+                    "tertiary": "#78352b",
+                    "on-tertiary-container": "#ffd3cc",
+                    "on-surface": "#181d1a",
+                    "inverse-surface": "#2d312f",
+                    "tertiary-fixed-dim": "#ffb4a8",
+                    "primary-fixed-dim": "#84d6b9",
+                    "secondary-fixed": "#dee2f7",
+                    "background": "#f7faf6",
+                    "tertiary-fixed": "#ffdad4",
+                    "tertiary-container": "#954c41",
+                    "surface-tint": "#086b53",
+                    "on-tertiary-fixed": "#3b0804",
+                    "surface": "#f7faf6",
+                    "on-background": "#181d1a",
+                    "surface-container": "#ebefeb",
+                    "primary-container": "#0f6e56",
+                    "outline-variant": "#bec9c3",
+                    "on-tertiary": "#ffffff",
+                    "on-surface-variant": "#3f4944",
+                    "inverse-on-surface": "#eef2ee"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "stack_sm": "0.5rem",
+                    "stack_md": "1rem",
+                    "gutter": "1.5rem",
+                    "sidebar_width": "220px",
+                    "margin_desktop": "2rem",
+                    "stack_lg": "1.5rem",
+                    "margin_mobile": "1rem"
+            },
+            "fontFamily": {
+                    "headline-sm": ["Inter"],
+                    "label-md": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "headline-md": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                    "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                    "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+                    "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                    "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                    "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                    "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #F8F7F4; }
+        .nav-text-color { color: #1A1F2E; }
+        .text-navy { color: #1A1F2E; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden text-on-surface">
+<!-- SideNavBar Component -->
+<nav class="fixed left-0 top-0 h-screen w-[220px] bg-inverse-surface dark:bg-inverse-surface flex flex-col justify-between py-6 z-50">
+<div>
+<div class="px-margin_desktop mb-8">
+<h1 class="text-headline-sm font-headline-sm font-bold text-primary-fixed">RankAI</h1>
+<p class="font-body-md text-body-md text-primary-fixed-dim">AI Talent Acquisition</p>
+</div>
+<ul class="flex flex-col space-y-1">
+<li><a class="text-on-surface-variant dark:text-on-secondary-fixed-variant py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 hover:text-primary-fixed transition-colors" href="#"><span class="material-symbols-outlined">dashboard</span> <span class="font-body-md text-body-md">Dashboard</span></a></li>
+<li><a class="text-on-surface-variant dark:text-on-secondary-fixed-variant py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 hover:text-primary-fixed transition-colors" href="#"><span class="material-symbols-outlined">groups</span> <span class="font-body-md text-body-md">Candidates</span></a></li>
+<li><a class="text-on-surface-variant dark:text-on-secondary-fixed-variant py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 hover:text-primary-fixed transition-colors" href="#"><span class="material-symbols-outlined">work</span> <span class="font-body-md text-body-md">Job Roles</span></a></li>
+<li><a class="text-on-surface-variant dark:text-on-secondary-fixed-variant py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 hover:text-primary-fixed transition-colors" href="#"><span class="material-symbols-outlined">description</span> <span class="font-body-md text-body-md">Audit Report</span></a></li>
+<li><a class="text-on-surface-variant dark:text-on-secondary-fixed-variant py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 hover:text-primary-fixed transition-colors" href="#"><span class="material-symbols-outlined">settings</span> <span class="font-body-md text-body-md">Settings</span></a></li>
+</ul>
+</div>
+<div class="mt-auto">
+<ul>
+<li><a class="text-on-surface-variant dark:text-on-secondary-fixed-variant py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 hover:text-primary-fixed transition-colors" href="#"><span class="material-symbols-outlined">account_circle</span> <span class="font-body-md text-body-md">Aisha Patel</span></a></li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="ml-[220px] flex-1 overflow-y-auto w-full h-full p-margin_desktop bg-[#F8F7F4]">
+<div class="max-w-[680px] mx-auto mt-8 mb-16 flex flex-col gap-stack_lg">
+<!-- Header & Exit -->
+<div class="flex justify-between items-center mb-4">
+<h2 class="font-headline-md text-headline-md text-navy">New Pipeline</h2>
+<button class="font-body-md text-body-md text-on-surface-variant flex items-center gap-2 hover:text-navy transition-colors">
+<span class="material-symbols-outlined text-sm">close</span> Cancel
+                </button>
+</div>
+<!-- Stepper -->
+<div class="flex items-center justify-between relative mb-8">
+<div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-[2px] bg-outline-variant/30 -z-10"></div>
+<!-- Step 1 (Active) -->
+<div class="flex flex-col items-center gap-stack_sm bg-[#F8F7F4] px-4">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-label-md text-label-md">1</div>
+<span class="font-label-md text-label-md text-navy">Job Description</span>
+</div>
+<!-- Step 2 (Inactive) -->
+<div class="flex flex-col items-center gap-stack_sm bg-[#F8F7F4] px-4">
+<div class="w-8 h-8 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center font-label-md text-label-md">2</div>
+<span class="font-label-md text-label-md text-on-surface-variant">Upload Candidates</span>
+</div>
+<!-- Step 3 (Inactive) -->
+<div class="flex flex-col items-center gap-stack_sm bg-[#F8F7F4] px-4">
+<div class="w-8 h-8 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center font-label-md text-label-md">3</div>
+<span class="font-label-md text-label-md text-on-surface-variant">Configure &amp; Run</span>
+</div>
+</div>
+<!-- Content Card -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-[2rem] flex flex-col gap-stack_lg">
+<h3 class="font-headline-sm text-[18px] font-bold text-navy">Job Description</h3>
+<!-- Tabs -->
+<div class="flex border-b border-outline-variant/30 gap-gutter">
+<button class="pb-2 border-b-2 border-primary-container text-primary-container font-label-md text-label-md uppercase">Paste Text</button>
+<button class="pb-2 text-on-surface-variant font-label-md text-label-md uppercase hover:text-navy transition-colors">Upload File</button>
+</div>
+<!-- Textarea -->
+<div class="flex flex-col gap-stack_sm">
+<textarea class="w-full min-h-[200px] p-4 border border-outline-variant/50 rounded focus:border-primary-container focus:ring-1 focus:ring-primary-container font-body-md text-body-md text-navy bg-surface-container-lowest resize-y" placeholder="Paste your full job description here..."></textarea>
+</div>
+<!-- Preview Strip (Simulated) -->
+<div class="flex flex-wrap gap-2 items-center bg-[#F1EFED] p-3 rounded">
+<span class="font-label-sm text-label-sm px-2 py-1 rounded bg-primary-container text-on-primary">6 must-haves detected</span>
+<span class="font-label-sm text-label-sm px-2 py-1 rounded bg-[#E3F2FD] text-[#0D47A1]">4 nice-to-haves</span>
+<span class="font-label-sm text-label-sm px-2 py-1 rounded bg-[#F3E5F5] text-[#4A148C]">3 culture signals</span>
+<span class="font-label-sm text-label-sm px-2 py-1 rounded bg-[#FFF8E1] text-[#F57F17]">2 seniority markers</span>
+</div>
+<!-- Inputs -->
+<div class="grid grid-cols-2 gap-gutter">
+<div class="flex flex-col gap-stack_sm">
+<label class="font-label-md text-label-md text-navy">Job Title</label>
+<input class="w-full p-2 border border-outline-variant/50 rounded focus:border-primary-container focus:ring-1 focus:ring-primary-container font-body-md text-body-md text-navy bg-surface-container-lowest" type="text" value="Senior Software Engineer"/>
+</div>
+<div class="flex flex-col gap-stack_sm">
+<label class="font-label-md text-label-md text-navy">Company Name</label>
+<input class="w-full p-2 border border-outline-variant/50 rounded focus:border-primary-container focus:ring-1 focus:ring-primary-container font-body-md text-body-md text-navy bg-surface-container-lowest" type="text" value="Acme Inc"/>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="flex justify-end mt-4 pt-4 border-t border-outline-variant/30">
+<button class="bg-primary-container text-on-primary px-6 py-2 rounded font-label-md text-label-md uppercase tracking-wider hover:opacity-90 transition-opacity flex items-center gap-2">
+                        Next: Upload Candidates <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Helper Text -->
+<p class="text-center font-body-md text-[12px] text-on-surface-variant flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-[14px]">lock</span> Your data stays local. Nothing is sent to external servers.
+            </p>
+</div>
+</main>
+</body></html>

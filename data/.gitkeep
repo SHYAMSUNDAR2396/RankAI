@@ -1,0 +1,4 @@
+# Sample dataset directory (not a Python package).
+# Populated in a later task with:
+#   - sample_candidates.json      (15 sample profiles across 5 categories)
+#   - sample_job_description.json (Senior Software Engineer, Series B SaaS)

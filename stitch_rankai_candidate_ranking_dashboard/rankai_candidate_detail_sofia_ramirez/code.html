@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sofia Ramirez - Candidate Detail</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#ebefeb",
+                        "on-primary-fixed-variant": "#00513e",
+                        "secondary-container": "#dbdff4",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#743329",
+                        "on-background": "#181d1a",
+                        "surface-container-low": "#f1f4f1",
+                        "secondary": "#595e6f",
+                        "on-tertiary-container": "#ffd3cc",
+                        "outline": "#6f7a74",
+                        "secondary-fixed": "#dee2f7",
+                        "surface": "#f7faf6",
+                        "primary-fixed": "#a0f3d4",
+                        "on-secondary-fixed-variant": "#414657",
+                        "tertiary-fixed-dim": "#ffb4a8",
+                        "tertiary-fixed": "#ffdad4",
+                        "outline-variant": "#bec9c3",
+                        "on-primary-container": "#9aedcf",
+                        "on-secondary-container": "#5d6274",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed": "#161b2a",
+                        "error": "#ba1a1a",
+                        "on-surface-variant": "#3f4944",
+                        "inverse-primary": "#84d6b9",
+                        "background": "#F8F7F4", // Overridden as per instructions
+                        "primary-container": "#0f6e56",
+                        "surface-variant": "#e0e3e0",
+                        "on-primary-fixed": "#002117",
+                        "surface-bright": "#f7faf6",
+                        "on-error": "#ffffff",
+                        "tertiary-container": "#954c41",
+                        "inverse-surface": "#1A1F2E", // Overridden for Navy Sidebar
+                        "secondary-fixed-dim": "#c1c6da",
+                        "tertiary": "#78352b",
+                        "surface-tint": "#086b53",
+                        "on-tertiary-fixed": "#3b0804",
+                        "error-container": "#ffdad6",
+                        "on-surface": "#181d1a",
+                        "primary-fixed-dim": "#84d6b9",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#d7dbd7",
+                        "primary": "#0F6E56", // Teal Accent
+                        "on-secondary": "#ffffff",
+                        "surface-container-highest": "#e0e3e0",
+                        "inverse-on-surface": "#eef2ee",
+                        "surface-container-high": "#e5e9e5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "stack_sm": "0.5rem",
+                        "margin_mobile": "1rem",
+                        "margin_desktop": "2rem",
+                        "stack_md": "1rem",
+                        "stack_lg": "1.5rem",
+                        "sidebar_width": "220px",
+                        "gutter": "1.5rem"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #F8F7F4; }
+        .card-level-1 { background-color: #FFFFFF; border: 1px solid #E8E6E1; }
+        .text-navy { color: #1A1F2E; }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md h-screen flex overflow-hidden">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-screen w-[220px] bg-inverse-surface dark:bg-inverse-surface flex flex-col justify-between py-6 z-20">
+<div>
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center text-on-primary font-bold">R</div>
+<div>
+<h1 class="text-headline-sm font-headline-sm font-bold text-primary-fixed">RankAI</h1>
+<p class="text-[10px] text-surface-variant">AI Talent Acquisition</p>
+</div>
+</div>
+<ul class="flex flex-col">
+<!-- Dashboard -->
+<li>
+<a class="text-on-surface-variant dark:text-on-secondary-fixed-variant py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 hover:text-primary-fixed transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+</li>
+<!-- Candidates (Active based on context) -->
+<li>
+<a class="bg-primary-container/20 text-primary-fixed border-l-4 border-primary-fixed font-bold py-3 px-4 flex items-center gap-3 active:opacity-90 transition-opacity duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+<span class="font-body-md text-body-md">Candidates</span>
+</a>
+</li>
+<!-- Job Roles -->
+<li>
+<a class="text-on-surface-variant dark:text-on-secondary-fixed-variant py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 hover:text-primary-fixed transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="work">work</span>
+<span class="font-body-md text-body-md">Job Roles</span>
+</a>
+</li>
+<!-- Audit Report -->
+<li>
+<a class="text-on-surface-variant dark:text-on-secondary-fixed-variant py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 hover:text-primary-fixed transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-body-md text-body-md">Audit Report</span>
+</a>
+</li>
+<!-- Settings -->
+<li>
+<a class="text-on-surface-variant dark:text-on-secondary-fixed-variant py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 hover:text-primary-fixed transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</li>
+</ul>
+</div>
+<div class="px-4">
+<a class="text-on-surface-variant dark:text-on-secondary-fixed-variant py-3 flex items-center gap-3 hover:text-primary-fixed transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+<span class="font-body-md text-body-md">Aisha Patel</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="flex-1 ml-[220px] flex flex-col h-screen overflow-hidden">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface border-b border-outline-variant dark:border-outline flex justify-between items-center w-full px-margin_desktop py-stack_md sticky top-0 z-10 h-16">
+<div class="flex-1">
+<!-- Breadcrumbs in Header -->
+<nav class="flex items-center space-x-2 text-label-md font-label-md text-on-surface-variant">
+<a class="hover:text-primary" href="#">Dashboard</a>
+<span>/</span>
+<a class="hover:text-primary" href="#">Candidates</a>
+<span>/</span>
+<span class="text-navy">Sofia Ramirez</span>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="px-4 py-2 border border-primary text-primary font-label-md text-label-md rounded active:scale-95 transition-transform hover:bg-surface-container-low">Export CSV</button>
+<button class="px-4 py-2 bg-primary text-white font-label-md text-label-md rounded active:scale-95 transition-transform hover:bg-primary/90">Run New Pipeline</button>
+</div>
+</header>
+<!-- Scrollable Content -->
+<main class="flex-1 overflow-y-auto p-margin_desktop pb-20">
+<!-- Page Header Section -->
+<div class="flex justify-between items-start mb-stack_lg">
+<div>
+<div class="flex items-center gap-3 mb-1">
+<h2 class="text-[26px] font-bold text-navy leading-tight">Sofia Ramirez</h2>
+<span class="bg-primary/10 text-primary px-2.5 py-0.5 rounded-full text-label-sm font-label-sm border border-primary/20">Rank #1</span>
+</div>
+<p class="text-body-lg font-body-lg text-on-surface-variant">Staff Engineer · 7 years experience</p>
+</div>
+<div class="flex items-center">
+<div class="relative w-16 h-16 flex items-center justify-center rounded-full border-4 border-surface-container">
+<div class="absolute inset-0 rounded-full border-4 border-primary" style="clip-path: polygon(0 0, 100% 0, 100% 84%, 0 84%);"></div>
+<span class="text-headline-sm font-headline-sm text-primary">8.4</span>
+</div>
+<span class="text-body-md font-body-md text-outline ml-2">/ 10</span>
+</div>
+</div>
+<!-- Two Column Layout -->
+<div class="flex flex-col lg:flex-row gap-gutter">
+<!-- Left Column (60%) -->
+<div class="flex-1 lg:w-[60%] flex flex-col gap-stack_lg">
+<!-- AI Panel Scores -->
+<div class="card-level-1 rounded-lg p-6">
+<h3 class="text-headline-md font-headline-md text-navy mb-6">AI Panel Scores</h3>
+<div class="space-y-5">
+<div>
+<div class="flex justify-between text-body-md font-body-md mb-2">
+<span class="text-on-surface">Hiring Manager Perspective</span>
+<span class="text-primary font-bold">8.5</span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-2">
+<div class="bg-primary h-2 rounded-full" style="width: 85%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-body-md font-body-md mb-2">
+<span class="text-on-surface">Peer Interviewer Perspective</span>
+<span class="text-primary font-bold">8.2</span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-2">
+<div class="bg-primary h-2 rounded-full" style="width: 82%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-body-md font-body-md mb-2">
+<span class="text-on-surface">Devil's Advocate Perspective</span>
+<span class="text-error font-bold">4.2</span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-2">
+<div class="bg-error h-2 rounded-full" style="width: 42%"></div>
+</div>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-outline-variant flex items-center text-label-md font-label-md text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] mr-2" data-icon="info">info</span>
+                            Low panel variance (0.4) — high confidence result
+                        </div>
+</div>
+<!-- AI Narrative -->
+<div class="card-level-1 rounded-lg p-6">
+<h3 class="text-headline-md font-headline-md text-navy mb-4">AI Narrative</h3>
+<blockquote class="border-l-4 border-primary/40 pl-4 py-1 mb-6 text-body-md font-body-md text-on-surface-variant italic">
+                            "Sofia demonstrates exceptional trajectory, moving from senior to staff level in under 3 years across increasing company complexity. The primary concern is limited exposure to Kubernetes in a production environment. Evidence of hands-on distributed systems work at scale would increase confidence further."
+                        </blockquote>
+<div class="flex flex-wrap gap-2">
+<span class="bg-primary/10 text-primary px-3 py-1 rounded text-label-sm font-label-sm">Strong trajectory</span>
+<span class="bg-primary/10 text-primary px-3 py-1 rounded text-label-sm font-label-sm">System design depth</span>
+<span class="bg-primary/10 text-primary px-3 py-1 rounded text-label-sm font-label-sm">Leadership signals</span>
+<span class="bg-amber-100 text-amber-900 px-3 py-1 rounded text-label-sm font-label-sm">Kubernetes gap</span>
+<span class="bg-amber-100 text-amber-900 px-3 py-1 rounded text-label-sm font-label-sm">Startup-only experience</span>
+</div>
+</div>
+<!-- Career Timeline -->
+<div class="card-level-1 rounded-lg p-6">
+<h3 class="text-headline-md font-headline-md text-navy mb-6">Career Timeline</h3>
+<div class="relative pl-6 border-l-2 border-surface-container space-y-8">
+<!-- Timeline Item 1 -->
+<div class="relative">
+<div class="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-primary border-4 border-white"></div>
+<div class="text-label-md font-label-md text-primary mb-1">2021–present</div>
+<div class="text-body-md font-body-md font-semibold text-navy">Staff Engineer, TechCorp</div>
+<div class="text-label-sm font-label-sm text-outline">Scaleup (50-500 employees)</div>
+</div>
+<!-- Timeline Item 2 -->
+<div class="relative">
+<div class="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-surface-variant border-4 border-white"></div>
+<div class="text-label-md font-label-md text-on-surface-variant mb-1">2018–2021</div>
+<div class="text-body-md font-body-md font-semibold text-navy">Senior Engineer, DataFlow Inc</div>
+<div class="text-label-sm font-label-sm text-outline">Startup (&lt;50 employees)</div>
+</div>
+<!-- Timeline Item 3 -->
+<div class="relative">
+<div class="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-surface-variant border-4 border-white"></div>
+<div class="text-label-md font-label-md text-on-surface-variant mb-1">2016–2018</div>
+<div class="text-body-md font-body-md font-semibold text-navy">Mid-level Engineer, Agency</div>
+<div class="text-label-sm font-label-sm text-outline">Startup (&lt;50 employees)</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column (40% mapped to approx 38% visual) -->
+<div class="lg:w-[38%] flex flex-col gap-stack_lg">
+<!-- Trajectory Signals -->
+<div class="card-level-1 rounded-lg p-6">
+<h3 class="text-headline-md font-headline-md text-navy mb-6">Trajectory Signals</h3>
+<div class="space-y-6">
+<div class="flex justify-between items-center">
+<div>
+<div class="text-label-md font-label-md text-outline uppercase tracking-wider">Growth Rate</div>
+<div class="text-headline-sm font-headline-sm text-navy mt-1">0.82</div>
+</div>
+<div class="w-16 h-8 flex items-end">
+<!-- Fake sparkline -->
+<div class="w-full h-full border-b-2 border-primary border-dashed relative">
+<div class="absolute bottom-0 right-0 w-1.5 h-1.5 bg-primary rounded-full transform translate-x-1/2 translate-y-1/2"></div>
+</div>
+</div>
+</div>
+<div class="flex justify-between items-center">
+<div>
+<div class="text-label-md font-label-md text-outline uppercase tracking-wider">Complexity Arc</div>
+<div class="text-body-md font-body-md text-navy mt-1 font-semibold">Ascending</div>
+</div>
+<span class="material-symbols-outlined text-primary" data-icon="trending_up">trending_up</span>
+</div>
+<div>
+<div class="flex justify-between items-end mb-2">
+<div class="text-label-md font-label-md text-outline uppercase tracking-wider">Leadership Progression</div>
+<div class="text-label-md font-label-md text-navy">64%</div>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1.5">
+<div class="bg-primary h-1.5 rounded-full" style="width: 64%"></div>
+</div>
+</div>
+<div class="flex justify-between items-center">
+<div>
+<div class="text-label-md font-label-md text-outline uppercase tracking-wider">Tenure Consistency</div>
+<div class="text-body-md font-body-md text-navy mt-1">0.91</div>
+</div>
+<div class="w-3 h-3 rounded-full bg-green-500"></div>
+</div>
+</div>
+</div>
+<!-- Fairness Audit -->
+<div class="card-level-1 rounded-lg p-6">
+<h3 class="text-headline-md font-headline-md text-navy mb-4">Fairness Audit</h3>
+<div class="flex items-center gap-2 mb-4 bg-green-50 text-green-800 p-3 rounded-md border border-green-100">
+<span class="material-symbols-outlined text-[20px]" data-icon="health_and_safety">health_and_safety</span>
+<span class="text-body-md font-body-md font-medium">Clean — No bias flag</span>
+</div>
+<div class="flex justify-between items-center mb-2">
+<span class="text-body-md font-body-md text-on-surface">Counterfactual delta</span>
+<span class="text-body-md font-body-md font-mono text-outline">0.31</span>
+</div>
+<p class="text-label-sm font-label-sm text-outline mt-4">Name, pronoun, and institution swaps tested.</p>
+</div>
+<!-- Reviewer Actions -->
+<div class="card-level-1 rounded-lg p-6 bg-[#F1EFED]/50">
+<h3 class="text-headline-md font-headline-md text-navy mb-4">Reviewer Actions</h3>
+<div class="flex flex-col gap-3">
+<button class="w-full py-3 bg-primary text-white font-label-md text-label-md rounded active:scale-95 transition-transform hover:bg-primary/90 flex justify-center items-center gap-2">
+                                Advance to Interview
+                            </button>
+<button class="w-full py-2.5 border border-amber-600 text-amber-700 font-label-md text-label-md rounded active:scale-95 transition-transform hover:bg-amber-50">
+                                Flag for Review
+                            </button>
+<div class="flex gap-3">
+<button class="flex-1 py-2.5 border border-error text-error font-label-md text-label-md rounded active:scale-95 transition-transform hover:bg-error/5">
+                                    Reject
+                                </button>
+<button class="flex-1 py-2.5 border border-outline text-on-surface-variant font-label-md text-label-md rounded active:scale-95 transition-transform hover:bg-surface-container-low">
+                                    Add Note
+                                </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

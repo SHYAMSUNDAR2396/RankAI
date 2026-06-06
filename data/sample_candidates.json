@@ -1,0 +1,377 @@
+[
+  {
+    "candidate_id": "7f3e9a2c-1b4d-4c8e-9f6a-2d5b8e1c3a47",
+    "name": "Sofia Ramirez",
+    "email": "sofia.ramirez@example.com",
+    "years_experience": 8.0,
+    "roles": [
+      {
+        "title": "Senior Data Scientist",
+        "company": "Cadence Payments",
+        "company_size_estimate": "scaleup 50-500",
+        "start_date": "2019-07",
+        "end_date": "2022-06",
+        "duration_months": 35,
+        "scope_keywords": ["machine learning", "production", "lead", "mentor", "A/B testing"]
+      }
+    ],
+    "skills_claimed": ["Python", "SQL", "PyTorch", "Scikit-learn", "MLflow", "AWS"],
+    "education": [
+      {"institution": "Stanford University", "degree": "M.S. Statistics", "year": 2016}
+    ],
+    "trajectory_vector": null,
+    "raw_text": "Sofia Ramirez is a senior data scientist with eight years of experience. She spent the last three years at Cadence Payments building fraud detection models and deploying them using MLflow and AWS. She regularly mentors junior team members and designs complex A/B tests to validate model ROI.",
+    "source_file": "sample_candidates.json",
+    "is_complete": true
+  },
+  {
+    "candidate_id": "a1c4e7b9-3d2f-4a6c-8b1e-9f3d7c2a5e84",
+    "name": "David Okoye",
+    "email": "david.okoye@example.com",
+    "years_experience": 6.5,
+    "roles": [
+      {
+        "title": "Data Scientist",
+        "company": "LogisticsTech",
+        "company_size_estimate": "enterprise >1000",
+        "start_date": "2018-01",
+        "end_date": "2022-01",
+        "duration_months": 48,
+        "scope_keywords": ["forecasting", "SQL", "Spark", "models"]
+      }
+    ],
+    "skills_claimed": ["Python", "SQL", "Spark", "Pandas", "GCP"],
+    "education": [
+      {"institution": "MIT", "degree": "B.S. Mathematics", "year": 2017}
+    ],
+    "trajectory_vector": null,
+    "raw_text": "David is a skilled Data Scientist who worked at LogisticsTech, building demand forecasting models. He wrote robust PySpark pipelines to process big data and deployed his models on GCP. He works closely with data engineers to ensure his models are production-ready.",
+    "source_file": "sample_candidates.json",
+    "is_complete": true
+  },
+  {
+    "candidate_id": "c9b2d5f8-6a3e-4d1c-b7f9-2e8a4c6d1b53",
+    "name": "Aisha Khan",
+    "email": "aisha.khan@example.com",
+    "years_experience": 7.0,
+    "roles": [
+      {
+        "title": "Data Science Lead",
+        "company": "HealthMetrics",
+        "company_size_estimate": "startup <50",
+        "start_date": "2020-01",
+        "end_date": null,
+        "duration_months": 53,
+        "scope_keywords": ["ML", "lead", "production", "cross-functional"]
+      }
+    ],
+    "skills_claimed": ["Python", "TensorFlow", "SQL", "Kubeflow", "AWS"],
+    "education": [
+      {"institution": "University of Texas at Austin", "degree": "B.S. Computer Science", "year": 2016}
+    ],
+    "trajectory_vector": null,
+    "raw_text": "Aisha leads the data science efforts at HealthMetrics. She established the MLOps pipeline using Kubeflow and AWS. She regularly communicates complex analytical findings to the executive team and mentors two junior data scientists.",
+    "source_file": "sample_candidates.json",
+    "is_complete": true
+  },
+  {
+    "candidate_id": "e4d7a1c3-8b6f-4e2a-9c5d-3f7b1a8e6d29",
+    "name": "Liam Chen",
+    "email": "liam.chen@example.com",
+    "years_experience": 5.0,
+    "roles": [
+      {
+        "title": "Machine Learning Engineer",
+        "company": "Pagecraft",
+        "company_size_estimate": "startup <50",
+        "start_date": "2019-03",
+        "end_date": "2021-08",
+        "duration_months": 29,
+        "scope_keywords": ["Python", "REST APIs", "deployment"]
+      }
+    ],
+    "skills_claimed": ["Python", "Docker", "FastAPI", "Scikit-learn"],
+    "education": [
+      {"institution": "UC Berkeley", "degree": "B.A. Computer Science", "year": 2018}
+    ],
+    "trajectory_vector": null,
+    "raw_text": "Liam bridges the gap between software engineering and data science. He excels at taking Scikit-learn models and wrapping them in FastAPI for production use. He doesn't have much A/B testing experience but is great at Python development.",
+    "source_file": "sample_candidates.json",
+    "is_complete": true
+  },
+  {
+    "candidate_id": "b8f1d4a6-2c9e-4b7d-a3f8-6e1c9d4b2a75",
+    "name": "Priya Nair",
+    "email": "priya.nair@example.com",
+    "years_experience": 9.0,
+    "roles": [
+      {
+        "title": "Senior Data Analyst",
+        "company": "Global Retail",
+        "company_size_estimate": "enterprise >1000",
+        "start_date": "2015-05",
+        "end_date": "2023-01",
+        "duration_months": 92,
+        "scope_keywords": ["SQL", "Tableau", "reporting"]
+      }
+    ],
+    "skills_claimed": ["SQL", "Tableau", "Excel", "R"],
+    "education": [
+      {"institution": "University of Mumbai", "degree": "B.Com", "year": 2014}
+    ],
+    "trajectory_vector": null,
+    "raw_text": "Priya has deep analytical experience building dashboards and writing advanced SQL queries for Global Retail. While she is an expert in data visualization and BI, she lacks experience building predictive machine learning models in Python.",
+    "source_file": "sample_candidates.json",
+    "is_complete": true
+  },
+  {
+    "candidate_id": "d3a6c9f2-5e8b-4d1a-9c7f-2b6e4a8d1c63",
+    "name": "Marcus Bell",
+    "email": "marcus.bell@example.com",
+    "years_experience": 2.5,
+    "roles": [
+      {
+        "title": "Junior Data Scientist",
+        "company": "DataCorp",
+        "company_size_estimate": "startup <50",
+        "start_date": "2021-06",
+        "end_date": "2023-12",
+        "duration_months": 30,
+        "scope_keywords": ["Python", "cleaning", "models"]
+      }
+    ],
+    "skills_claimed": ["Python", "Pandas", "Scikit-learn"],
+    "education": [
+      {"institution": "NYU", "degree": "M.S. Data Science", "year": 2021}
+    ],
+    "trajectory_vector": null,
+    "raw_text": "Marcus is a junior data scientist who mostly focuses on data cleaning and training basic models. He has not deployed models to production or led any projects.",
+    "source_file": "sample_candidates.json",
+    "is_complete": true
+  },
+  {
+    "candidate_id": "a5d8b2e1-4c7f-49a3-b6d2-8f1e5c3a9b74",
+    "name": "Yuki Tanaka",
+    "email": "yuki.t@example.com",
+    "years_experience": 4.0,
+    "roles": [
+      {
+        "title": "Data Scientist",
+        "company": "Fintech Innovations",
+        "company_size_estimate": "scaleup 50-500",
+        "start_date": "2019-09",
+        "end_date": "2022-10",
+        "duration_months": 37,
+        "scope_keywords": ["credit scoring", "Python", "SQL"]
+      }
+    ],
+    "skills_claimed": ["Python", "SQL", "Scikit-learn", "XGBoost"],
+    "education": [
+      {"institution": "University of Tokyo", "degree": "B.S. Economics", "year": 2018}
+    ],
+    "trajectory_vector": null,
+    "raw_text": "Yuki built credit scoring models using XGBoost and Python. She worked closely with the risk team to explain her models. However, she relied on engineering to deploy the models into production.",
+    "source_file": "sample_candidates.json",
+    "is_complete": true
+  },
+  {
+    "candidate_id": "e2c5b8-9d4f-4a1c-b6e3-8f2d5c7a9b14",
+    "name": "Mei Lin",
+    "email": "mei.lin@example.com",
+    "years_experience": 6.0,
+    "roles": [
+      {
+        "title": "Senior Data Scientist",
+        "company": "EduTech Solutions",
+        "company_size_estimate": "startup <50",
+        "start_date": "2018-05",
+        "end_date": "2023-05",
+        "duration_months": 60,
+        "scope_keywords": ["NLP", "PyTorch", "production"]
+      }
+    ],
+    "skills_claimed": ["Python", "PyTorch", "NLP", "HuggingFace", "GCP"],
+    "education": [
+      {"institution": "Carnegie Mellon University", "degree": "M.S. Computer Science", "year": 2017}
+    ],
+    "trajectory_vector": null,
+    "raw_text": "Mei specialized in NLP during her time at EduTech. She trained PyTorch models for student essay grading and deployed them to GCP. She is highly technical and works async efficiently.",
+    "source_file": "sample_candidates.json",
+    "is_complete": true
+  },
+  {
+    "candidate_id": "c5b8e1a4-7d2f-4c6b-a9e3-5f8d1c4b7a26",
+    "name": "Shyam Sundar",
+    "email": "shyam@example.com",
+    "years_experience": 3.0,
+    "roles": [
+      {
+        "title": "Data Science Intern",
+        "company": "MegaCorp",
+        "company_size_estimate": "enterprise >1000",
+        "start_date": "2022-05",
+        "end_date": "2022-08",
+        "duration_months": 3,
+        "scope_keywords": ["analysis", "Python"]
+      }
+    ],
+    "skills_claimed": ["Python", "Pandas", "Jupyter"],
+    "education": [
+      {"institution": "University of Michigan", "degree": "B.S. Data Science", "year": 2023}
+    ],
+    "trajectory_vector": null,
+    "raw_text": "Mohammed recently graduated and has internship experience doing exploratory data analysis in Jupyter notebooks. He has no full-time experience.",
+    "source_file": "sample_candidates.json",
+    "is_complete": true
+  },
+  {
+    "candidate_id": "f8a2c1d3-6e4b-4a5f-9d7b-3e1c5a9b8f2d",
+    "name": "Emily Watson",
+    "email": "emily.w@example.com",
+    "years_experience": 3.5,
+    "roles": [
+      {
+        "title": "Data Scientist",
+        "company": "HealthStartup",
+        "company_size_estimate": "startup <50",
+        "start_date": "2020-02",
+        "end_date": "2023-08",
+        "duration_months": 42,
+        "scope_keywords": ["Python", "SQL", "dashboards"]
+      }
+    ],
+    "skills_claimed": ["Python", "SQL", "Looker", "Scikit-learn"],
+    "education": [
+      {"institution": "University of Washington", "degree": "B.S. Informatics", "year": 2019}
+    ],
+    "trajectory_vector": null,
+    "raw_text": "Emily worked mostly on building Looker dashboards and writing SQL queries, with occasional predictive modeling using Scikit-learn. She has not deployed models to production.",
+    "source_file": "sample_candidates.json",
+    "is_complete": true
+  },
+  {
+    "candidate_id": "b1d4a7c2-5e8f-4b6a-9c3e-7d2f5a8c1b49",
+    "name": "Kevin Park",
+    "email": "kpark@example.com",
+    "years_experience": 12.0,
+    "roles": [
+      {
+        "title": "Principal Data Scientist",
+        "company": "AdTech Global",
+        "company_size_estimate": "enterprise >1000",
+        "start_date": "2015-01",
+        "end_date": "2023-01",
+        "duration_months": 96,
+        "scope_keywords": ["leadership", "strategy", "big data", "Spark"]
+      }
+    ],
+    "skills_claimed": ["Python", "Spark", "AWS", "Leadership", "A/B Testing"],
+    "education": [
+      {"institution": "UCLA", "degree": "Ph.D. Statistics", "year": 2013}
+    ],
+    "trajectory_vector": null,
+    "raw_text": "Kevin is a seasoned Principal Data Scientist who leads teams of 20+ people. He designs complex A/B testing frameworks for ad targeting and handles big data with Spark. He's very experienced but might be overqualified.",
+    "source_file": "sample_candidates.json",
+    "is_complete": true
+  },
+  {
+    "candidate_id": "d7c2f5a8-1b4e-4d9c-a6f3-8e1c4b7d2a56",
+    "name": "Ashley Nguyen",
+    "email": "ashley.n@example.com",
+    "years_experience": 4.5,
+    "roles": [
+      {
+        "title": "Machine Learning Engineer",
+        "company": "AutoDrive",
+        "company_size_estimate": "scaleup 50-500",
+        "start_date": "2019-06",
+        "end_date": "2023-12",
+        "duration_months": 54,
+        "scope_keywords": ["computer vision", "PyTorch", "deployment"]
+      }
+    ],
+    "skills_claimed": ["Python", "PyTorch", "C++", "Docker"],
+    "education": [
+      {"institution": "Georgia Tech", "degree": "M.S. Computer Science", "year": 2019}
+    ],
+    "trajectory_vector": null,
+    "raw_text": "Ashley focuses heavily on computer vision models using PyTorch. She writes highly optimized C++ and Python code to deploy models to edge devices. She has less experience with SQL or A/B testing.",
+    "source_file": "sample_candidates.json",
+    "is_complete": true
+  },
+  {
+    "candidate_id": "a9b3c4d5-e6f7-4a8b-9c0d-1e2f3a4b5c6d",
+    "name": "James Smith",
+    "email": "james.s@example.com",
+    "years_experience": 2.0,
+    "roles": [
+      {
+        "title": "Data Analyst",
+        "company": "Bank",
+        "company_size_estimate": "enterprise >1000",
+        "start_date": "2021-01",
+        "end_date": "2023-01",
+        "duration_months": 24,
+        "scope_keywords": ["Excel", "reporting"]
+      }
+    ],
+    "skills_claimed": ["Excel", "SQL", "PowerBI"],
+    "education": [
+      {"institution": "Ohio State", "degree": "B.S. Finance", "year": 2020}
+    ],
+    "trajectory_vector": null,
+    "raw_text": "James creates financial reports using Excel and PowerBI. He does not know Python and has no machine learning experience.",
+    "source_file": "sample_candidates.json",
+    "is_complete": true
+  },
+  {
+    "candidate_id": "c1b4e7a2-8d5f-4c6b-9a3e-2f7d1c4a8b59",
+    "name": "Fatima Hassan",
+    "email": "fatima.h@example.com",
+    "years_experience": 5.5,
+    "roles": [
+      {
+        "title": "Data Scientist",
+        "company": "E-commerce Startup",
+        "company_size_estimate": "startup <50",
+        "start_date": "2018-06",
+        "end_date": "2023-11",
+        "duration_months": 65,
+        "scope_keywords": ["Python", "recommender systems", "SQL"]
+      }
+    ],
+    "skills_claimed": ["Python", "SQL", "Scikit-learn", "A/B Testing"],
+    "education": [
+      {"institution": "University of Toronto", "degree": "M.S. Applied Math", "year": 2018}
+    ],
+    "trajectory_vector": null,
+    "raw_text": "Fatima built the core recommendation engine for an e-commerce startup. She designed A/B tests to measure its success and wrote SQL pipelines for feature extraction. She often presented results directly to the CEO.",
+    "source_file": "sample_candidates.json",
+    "is_complete": true
+  },
+  {
+    "candidate_id": "f5a8c1d4-7b2e-4f9c-a6d3-8c1e5b4a7d62",
+    "name": "Neha Sharma",
+    "email": "neha.s@example.com",
+    "years_experience": 7.5,
+    "roles": [
+      {
+        "title": "Senior Machine Learning Engineer",
+        "company": "StreamingCo",
+        "company_size_estimate": "enterprise >1000",
+        "start_date": "2016-08",
+        "end_date": "2024-01",
+        "duration_months": 89,
+        "scope_keywords": ["production ML", "AWS", "mentoring"]
+      }
+    ],
+    "skills_claimed": ["Python", "AWS", "MLOps", "Kubeflow", "SQL"],
+    "education": [
+      {"institution": "University of Waterloo", "degree": "B.S. Software Engineering", "year": 2016}
+    ],
+    "trajectory_vector": null,
+    "raw_text": "Neha is an expert in MLOps and productionizing models. At StreamingCo, she managed the Kubeflow infrastructure on AWS and deployed models serving millions of requests. She mentors several engineers and documents best practices meticulously.",
+    "source_file": "sample_candidates.json",
+    "is_complete": true
+  }
+]

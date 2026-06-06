@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RankAI - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline-variant": "#bec9c3",
+                        "secondary": "#595e6f",
+                        "surface-container-low": "#f1f4f1",
+                        "primary": "#005440",
+                        "on-background": "#181d1a",
+                        "outline": "#6f7a74",
+                        "on-tertiary": "#ffffff",
+                        "tertiary": "#78352b",
+                        "on-surface": "#181d1a",
+                        "inverse-primary": "#84d6b9",
+                        "on-secondary-fixed": "#161b2a",
+                        "inverse-on-surface": "#eef2ee",
+                        "on-tertiary-fixed-variant": "#743329",
+                        "secondary-fixed": "#dee2f7",
+                        "on-tertiary-container": "#ffd3cc",
+                        "surface-bright": "#f7faf6",
+                        "on-primary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-container": "#9aedcf",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#414657",
+                        "surface-tint": "#086b53",
+                        "surface-container": "#ebefeb",
+                        "surface": "#f7faf6",
+                        "tertiary-container": "#954c41",
+                        "surface-dim": "#d7dbd7",
+                        "tertiary-fixed-dim": "#ffb4a8",
+                        "on-secondary-container": "#5d6274",
+                        "on-error-container": "#93000a",
+                        "primary-fixed": "#a0f3d4",
+                        "primary-fixed-dim": "#84d6b9",
+                        "on-primary-fixed-variant": "#00513e",
+                        "surface-variant": "#e0e3e0",
+                        "inverse-surface": "#2d312f",
+                        "background": "#f7faf6",
+                        "on-secondary": "#ffffff",
+                        "primary-container": "#0f6e56",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#c1c6da",
+                        "tertiary-fixed": "#ffdad4",
+                        "error": "#ba1a1a",
+                        "secondary-container": "#dbdff4",
+                        "on-tertiary-fixed": "#3b0804",
+                        "surface-container-high": "#e5e9e5",
+                        "on-primary-fixed": "#002117",
+                        "surface-container-highest": "#e0e3e0",
+                        "on-surface-variant": "#3f4944",
+                        
+                        // Custom specific colors for requirement
+                        "req-amber": "#F59E0B", // Roughly standard amber for requirement
+                        "req-red": "#EF4444",   // Roughly standard red for requirement
+                        "req-teal": "#0F6E56",  // primary-container
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin_desktop": "2rem",
+                        "sidebar_width": "220px",
+                        "stack_md": "1rem",
+                        "margin_mobile": "1rem",
+                        "gutter": "1.5rem",
+                        "stack_sm": "0.5rem",
+                        "stack_lg": "1.5rem"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #F8F7F4;
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-surface flex min-h-screen">
+<!-- SideNavBar -->
+<nav class="bg-inverse-surface fixed left-0 top-0 h-screen w-[220px] flex flex-col justify-between py-6 z-20">
+<div>
+<div class="px-6 mb-8 flex flex-col gap-1">
+<span class="text-headline-sm font-headline-sm font-bold text-primary-fixed">RankAI</span>
+<span class="text-primary-fixed dark:text-primary-fixed-dim font-label-sm text-label-sm uppercase tracking-wider opacity-80">AI Talent Acquisition</span>
+</div>
+<ul class="flex flex-col font-body-md text-body-md">
+<li>
+<a class="bg-primary-container/20 text-primary-fixed border-l-4 border-primary-fixed font-bold py-3 px-4 flex items-center gap-3 opacity-90 transition-opacity duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+                        Dashboard
+                    </a>
+</li>
+<li>
+<a class="text-on-surface-variant dark:text-on-secondary-fixed-variant py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 hover:text-primary-fixed transition-colors" href="#">
+<span class="material-symbols-outlined">groups</span>
+                        Candidates
+                    </a>
+</li>
+<li>
+<a class="text-on-surface-variant dark:text-on-secondary-fixed-variant py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 hover:text-primary-fixed transition-colors" href="#">
+<span class="material-symbols-outlined">work</span>
+                        Job Roles
+                    </a>
+</li>
+<li>
+<a class="text-on-surface-variant dark:text-on-secondary-fixed-variant py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 hover:text-primary-fixed transition-colors" href="#">
+<span class="material-symbols-outlined">description</span>
+                        Audit Report
+                    </a>
+</li>
+<li>
+<a class="text-on-surface-variant dark:text-on-secondary-fixed-variant py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 hover:text-primary-fixed transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+                        Settings
+                    </a>
+</li>
+</ul>
+</div>
+<div class="px-4">
+<a class="text-on-surface-variant dark:text-on-secondary-fixed-variant py-3 px-4 flex items-center gap-3 hover:bg-primary-container/10 hover:text-primary-fixed transition-colors rounded" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+                Aisha Patel
+            </a>
+</div>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="flex-1 ml-[220px] flex flex-col min-w-0">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface border-b border-outline-variant dark:border-outline full-width top-0 sticky z-10 flex justify-between items-center w-full px-margin_desktop py-stack_md">
+<div>
+<!-- Brand logo hidden as per instructions -->
+<span class="hidden">RankAI</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="px-4 py-2 text-primary-container border border-primary-container rounded font-label-md text-label-md active:scale-95 transition-transform hover:bg-surface-container-low transition-colors">
+                    Export CSV
+                </button>
+<button class="px-4 py-2 bg-primary-container text-on-primary rounded font-label-md text-label-md active:scale-95 transition-transform hover:bg-primary-container/90 transition-colors shadow-none">
+                    Run New Pipeline
+                </button>
+</div>
+</header>
+<!-- Dashboard Canvas -->
+<main class="p-margin_desktop flex flex-col gap-stack_lg">
+<!-- Stats Row -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Stat 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-stack_lg flex flex-col gap-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Candidates Ranked</span>
+<span class="font-display-lg text-display-lg text-on-surface">15</span>
+</div>
+<!-- Stat 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-stack_lg flex flex-col gap-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Require Human Review</span>
+<span class="font-display-lg text-display-lg text-req-amber">3</span>
+</div>
+<!-- Stat 3 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-stack_lg flex flex-col gap-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Bias Flags Raised</span>
+<span class="font-display-lg text-display-lg text-req-red">2</span>
+</div>
+<!-- Stat 4 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-stack_lg flex flex-col gap-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Pipeline Confidence</span>
+<span class="font-display-lg text-display-lg text-primary-container">87%</span>
+</div>
+</section>
+<!-- Data Table Section -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden flex flex-col">
+<div class="p-4 border-b border-outline-variant">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Ranked Candidates</h2>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-lowest border-b border-outline-variant">
+<th class="py-3 px-4 font-label-md text-label-md text-secondary uppercase w-16">Rank</th>
+<th class="py-3 px-4 font-label-md text-label-md text-secondary uppercase">Name</th>
+<th class="py-3 px-4 font-label-md text-label-md text-secondary uppercase w-48">Score</th>
+<th class="py-3 px-4 font-label-md text-label-md text-secondary uppercase">Verdict</th>
+<th class="py-3 px-4 font-label-md text-label-md text-secondary uppercase w-24 text-center">Bias Flag</th>
+<th class="py-3 px-4 font-label-md text-label-md text-secondary uppercase w-24 text-center">Data Gap</th>
+<th class="py-3 px-4 font-label-md text-label-md text-secondary uppercase w-24 text-right">Action</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md text-on-surface">
+<!-- Row 1 -->
+<tr class="bg-surface-container-lowest hover:bg-[#F1EFED] border-l-4 border-transparent hover:border-primary-container transition-colors group border-b border-outline-variant/30">
+<td class="py-3 px-4 font-bold">#1</td>
+<td class="py-3 px-4">Sofia Ramirez</td>
+<td class="py-3 px-4">
+<div class="flex flex-col gap-1 w-full max-w-[120px]">
+<span>8.4/10</span>
+<div class="h-1 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[84%]"></div>
+</div>
+</div>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-1 rounded bg-primary-container text-on-primary font-label-sm text-label-sm">Strong Yes</span>
+</td>
+<td class="py-3 px-4 text-center text-on-surface-variant">No</td>
+<td class="py-3 px-4 text-center text-on-surface-variant">No</td>
+<td class="py-3 px-4 text-right">
+<button class="text-primary-container hover:underline font-label-md text-label-md">View</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="bg-[#F1EFED] hover:bg-[#F1EFED] border-l-4 border-transparent hover:border-primary-container transition-colors group border-b border-outline-variant/30">
+<td class="py-3 px-4 font-bold">#2</td>
+<td class="py-3 px-4">Marcus Chen</td>
+<td class="py-3 px-4">
+<div class="flex flex-col gap-1 w-full max-w-[120px]">
+<span>7.9/10</span>
+<div class="h-1 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[79%]"></div>
+</div>
+</div>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-1 rounded bg-primary-fixed-dim text-on-primary-fixed-variant font-label-sm text-label-sm">Yes</span>
+</td>
+<td class="py-3 px-4 text-center text-on-surface-variant">No</td>
+<td class="py-3 px-4 text-center text-on-surface-variant">No</td>
+<td class="py-3 px-4 text-right">
+<button class="text-primary-container hover:underline font-label-md text-label-md">View</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="bg-surface-container-lowest hover:bg-[#F1EFED] border-l-4 border-transparent hover:border-primary-container transition-colors group border-b border-outline-variant/30">
+<td class="py-3 px-4 font-bold">#3</td>
+<td class="py-3 px-4">Amara Okafor</td>
+<td class="py-3 px-4">
+<div class="flex flex-col gap-1 w-full max-w-[120px]">
+<span>7.2/10</span>
+<div class="h-1 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[72%]"></div>
+</div>
+</div>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-1 rounded bg-primary-fixed-dim text-on-primary-fixed-variant font-label-sm text-label-sm">Yes</span>
+</td>
+<td class="py-3 px-4 text-center">
+<span class="material-symbols-outlined text-req-amber text-lg" title="Bias Warning">warning</span>
+</td>
+<td class="py-3 px-4 text-center text-on-surface-variant">No</td>
+<td class="py-3 px-4 text-right">
+<button class="text-primary-container hover:underline font-label-md text-label-md">View</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="bg-[#F1EFED] hover:bg-[#F1EFED] border-l-4 border-transparent hover:border-primary-container transition-colors group border-b border-outline-variant/30">
+<td class="py-3 px-4 font-bold">#4</td>
+<td class="py-3 px-4">Daniel Park</td>
+<td class="py-3 px-4">
+<div class="flex flex-col gap-1 w-full max-w-[120px]">
+<span>6.8/10</span>
+<div class="h-1 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[68%]"></div>
+</div>
+</div>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-1 rounded bg-req-amber text-on-surface font-label-sm text-label-sm">Maybe</span>
+</td>
+<td class="py-3 px-4 text-center text-on-surface-variant">No</td>
+<td class="py-3 px-4 text-center">
+<span class="material-symbols-outlined text-req-red text-lg" title="Data Gap Flag">flag</span>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="text-primary-container hover:underline font-label-md text-label-md">View</button>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="bg-surface-container-lowest hover:bg-[#F1EFED] border-l-4 border-transparent hover:border-primary-container transition-colors group">
+<td class="py-3 px-4 font-bold">#5</td>
+<td class="py-3 px-4">Zara Nwosu</td>
+<td class="py-3 px-4">
+<div class="flex flex-col gap-1 w-full max-w-[120px]">
+<span>6.1/10</span>
+<div class="h-1 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[61%]"></div>
+</div>
+</div>
+</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-2 py-1 rounded bg-req-amber text-on-surface font-label-sm text-label-sm">Maybe</span>
+</td>
+<td class="py-3 px-4 text-center text-on-surface-variant">No</td>
+<td class="py-3 px-4 text-center text-on-surface-variant">No</td>
+<td class="py-3 px-4 text-right">
+<button class="text-primary-container hover:underline font-label-md text-label-md">View</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="p-4 border-t border-outline-variant flex justify-between items-center bg-surface-container-lowest">
+<span class="font-body-md text-body-md text-on-surface-variant">Showing 1–5 of 15</span>
+<div class="flex gap-2">
+<button class="p-1 text-on-surface-variant hover:bg-surface-container-low rounded transition-colors disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="p-1 text-on-surface hover:bg-surface-container-low rounded transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+</div>
+</body></html>

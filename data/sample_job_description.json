@@ -1,0 +1,63 @@
+{
+  "job_id": "8a7f19b2-3c4d-5e6f-7a8b-9c0d1e2f3a4b",
+  "title": "Senior Data Scientist",
+  "company": "InsightAnalytics",
+  "raw_text": "InsightAnalytics is a rapidly growing B2B analytics platform. We are looking for a Senior Data Scientist to join our core ML team. In this role, you will build predictive models, deploy them into production, and run complex A/B tests to measure impact.\n\nWhat you will do:\n- Build and deploy robust machine learning models using Python, Scikit-learn, and PyTorch.\n- Query large datasets using SQL and optimize data pipelines for model training.\n- Work closely with engineering to deploy models using modern MLOps practices.\n- Design and analyze A/B experiments to evaluate model performance and feature rollouts.\n- Mentor junior data scientists and translate complex statistical results for business stakeholders.\n\nWhat we are looking for:\n- 4+ years of professional data science experience.\n- Deep expertise in Python and SQL.\n- Proven track record of putting ML models into production.\n\nNice to have:\n- Experience with PySpark or other big data tools.\n- Familiarity with MLOps frameworks like MLflow or Kubeflow.\n- Cloud experience with AWS or GCP.",
+  "requirements": [
+    {
+      "text": "4+ years of professional data science experience",
+      "bucket": "must_have",
+      "dimension": "experience_level"
+    },
+    {
+      "text": "Strong proficiency in Python (Pandas, Scikit-learn, PyTorch)",
+      "bucket": "must_have",
+      "dimension": "technical"
+    },
+    {
+      "text": "Advanced SQL skills for complex querying",
+      "bucket": "must_have",
+      "dimension": "technical"
+    },
+    {
+      "text": "Proven experience deploying ML models into production",
+      "bucket": "must_have",
+      "dimension": "technical"
+    },
+    {
+      "text": "Experience designing and analyzing A/B tests",
+      "bucket": "nice_to_have",
+      "dimension": "technical"
+    },
+    {
+      "text": "Experience with MLOps tools (MLflow, Kubeflow)",
+      "bucket": "nice_to_have",
+      "dimension": "technical"
+    },
+    {
+      "text": "Familiarity with Spark or big data frameworks",
+      "bucket": "nice_to_have",
+      "dimension": "technical"
+    },
+    {
+      "text": "Cloud experience with AWS or GCP",
+      "bucket": "nice_to_have",
+      "dimension": "technical"
+    },
+    {
+      "text": "Ability to translate complex statistical concepts for stakeholders",
+      "bucket": "culture_signal",
+      "dimension": "soft_skill"
+    },
+    {
+      "text": "Track record of mentoring junior data scientists",
+      "bucket": "seniority_marker",
+      "dimension": "soft_skill"
+    },
+    {
+      "text": "Strong cross-functional collaboration with engineering",
+      "bucket": "seniority_marker",
+      "dimension": "soft_skill"
+    }
+  ]
+}

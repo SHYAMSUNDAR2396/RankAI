@@ -1,0 +1,21 @@
+# Candidate Ranking System - dependency manifest
+# Targets Python 3.11+ (see pyproject.toml `requires-python`).
+# Version constraints use the minimum-supported versions from the requirements
+# (Requirement 1.10); the local, free, open-source stack runs entirely offline
+# after the initial model downloads.
+
+# --- Runtime: free / local / open-source stack ---
+ollama>=0.3.0                 # Ollama Python SDK -> local LLM inference (Requirement 1.1)
+sentence-transformers>=3.0.0  # local Embedding_Model (BAAI/bge-large-en-v1.5) (Requirement 1.2)
+chromadb>=0.5.0               # local on-disk vector store, embedding_function=None (Requirement 1.3)
+PyMuPDF>=1.24.0               # .pdf text extraction (Requirement 2.1)
+python-docx>=1.1.0            # .docx text extraction (Requirement 2.2)
+spacy>=3.7.0                  # en_core_web_sm name/email fallback (Requirement 2.6)
+pandas>=2.2.0                 # ranked_candidates.csv writer (Requirement 8.3)
+pydantic>=2.7.0               # Pydantic v2 data models (Requirements 2.9, 3.8)
+rich>=13.7.0                  # CLI progress bar + tables (Requirements 9.7, 9.8)
+
+# --- Development / testing ---
+pytest>=8.2.0                 # test runner (Requirement 12)
+pytest-mock>=3.14.0           # mocking helper for ollama.chat (Requirement 12.5)
+hypothesis>=6.100.0           # property-based testing (Requirement 12.9, 12.10)
