@@ -1393,3 +1393,44 @@ def test_check_models_present_exits_when_model_missing() -> None:
         with pytest.raises(SystemExit) as exc_info:
             main.check_models_present()
     assert exc_info.value.code == 1
+
+
+# ---------------------------------------------------------------------------
+# Groq Backend Tests
+# ---------------------------------------------------------------------------
+
+
+def test_verify_startup_groq_missing_key() -> None:
+    """verify_startup exits with status 1 when LLM_BACKEND is 'groq' but GROQ_API_KEY is missing."""
+    with mock.patch("config.LLM_BACKEND", "groq"), \
+         mock.patch("config.GROQ_API_KEY", ""), \
+         mock.patch.dict("os.environ", {"GROQ_API_KEY": ""}), \
+         pytest.raises(SystemExit) as exc_info:
+        main.verify_startup()
+    assert exc_info.value.code == 1
+
+
+def test_verify_startup_groq_valid_key() -> None:
+    """verify_startup succeeds when LLM_BACKEND is 'groq' and GROQ_API_KEY is provided."""
+    with mock.patch("config.LLM_BACKEND", "groq"), \
+         mock.patch("config.GROQ_API_KEY", "mock-key"), \
+         mock.patch("importlib.util.find_spec", return_value=mock.MagicMock()):
+        main.verify_startup()  # Should not raise
+
+
+def test_ollama_client_uses_groq_completions() -> None:
+    """OllamaClient.chat calls groq client completions when LLM_BACKEND is 'groq'."""
+    mock_response = mock.MagicMock()
+    mock_response.choices[0].message.content = "mocked groq response"
+
+    mock_groq_instance = mock.MagicMock()
+    mock_groq_instance.chat.completions.create.return_value = mock_response
+
+    with mock.patch("config.LLM_BACKEND", "groq"), \
+         mock.patch("config.GROQ_API_KEY", "mock-key"), \
+         mock.patch("utils.ollama_client.Groq", return_value=mock_groq_instance):
+        client = OllamaClient()
+        response = client.chat([{"role": "user", "content": "hello"}])
+        assert response == "mocked groq response"
+        mock_groq_instance.chat.completions.create.assert_called_once()
+
