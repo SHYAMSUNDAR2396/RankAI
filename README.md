@@ -172,7 +172,7 @@ RankAI assigns each AI agent the model best suited to its cognitive load, rather
 
 ## 🔄 Pipeline Workflow
 
-<!-- ![RankAI Pipeline Workflow](./docs/diagrams/pipeline_workflow.png) -->
+[![RankAI System Architecture](./docs/diagrams/pipeline_workflow.svg)](./docs/diagrams/pipeline_workflow.svg)
 
 The pipeline runs 6 phases in strict sequence. Here is the complete end-to-end workflow annotated with timestamps from a real 15-candidate run:
 
