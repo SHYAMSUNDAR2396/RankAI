@@ -33,7 +33,7 @@ RankAI evaluates candidates the way a real hiring panel would — three AI perso
 
 ## 📐 Architecture
 
-[![RankAI System Architecture](./docs/diagrams/architecture.png)](./docs/diagrams/architecture.png)
+[![RankAI System Architecture](./docs/diagrams/architecture.svg)](./docs/diagrams/architecture.svg)
 
 <details>
 <summary>ASCII version</summary>
