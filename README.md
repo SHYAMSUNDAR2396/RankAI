@@ -670,9 +670,49 @@ Everything runs on CPU by default. For the bundled 15-candidate dataset:
 
 ---
 
-## 🔄 Alternative Backend: Groq Free Tier
+## 🔄 Groq API Backend Support
 
-The LLM swap seam is isolated in `OllamaClient`. You can switch to [Groq](https://groq.com/) free tier with `llama-3.1-70b` by changing **only** the client implementation and `requirements.txt`. All pipeline components — parsers, enrichers, scorers, auditor, and CLI — remain unchanged.
+RankAI natively supports the cloud-hosted [Groq API](https://groq.com/) as an alternative backend, leveraging larger models like `llama-3.3-70b-versatile` and `llama-3.1-8b-instant` for faster pipeline run times without local GPU hardware constraints.
+
+### How to Switch Between Ollama and Groq
+
+You can toggle the backend dynamically using environment variables or by modifying `config.py`.
+
+#### Option 1: Via Environment Variables (Recommended)
+
+1. **Get a Groq API Key**: Sign up at [Groq Console](https://console.groq.com/) and create an API key.
+2. **Run the Pipeline**: Set `LLM_BACKEND=groq` and supply your `GROQ_API_KEY`:
+
+   ```bash
+   LLM_BACKEND=groq GROQ_API_KEY=gsk_your_api_key_here python main.py
+   ```
+
+3. **Run the Dashboard Server**:
+   ```bash
+   LLM_BACKEND=groq GROQ_API_KEY=gsk_your_api_key_here uvicorn server:app --host 0.0.0.0 --port 8000 --reload
+   ```
+
+#### Option 2: Config Override (`config.py`)
+
+Open [config.py](./config.py) and modify the backend configurations near the top:
+
+```python
+# Backend selection: "ollama" or "groq"
+LLM_BACKEND: str = "groq"
+
+# Groq API Configuration
+GROQ_API_KEY: str = "gsk_your_api_key_here"
+```
+
+### Groq Model Assignments
+
+The pipeline assigns tasks to the optimized Groq models as follows:
+
+| Agent | Groq Model | Why This Model |
+|---|---|---|
+| Resume/JD Parsers | `llama-3.3-70b-versatile` | High context window & excellent schema-adherent structured extraction |
+| Trajectory / Personas | `llama-3.3-70b-versatile` | Superior complex reasoning and evaluation capabilities |
+| Skills Match / Narrative | `llama-3.1-8b-instant` | Super fast performance for low-cognitive simple match tasks |
 
 ---
 
