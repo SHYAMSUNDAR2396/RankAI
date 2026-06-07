@@ -527,7 +527,7 @@ The suite includes **76 tests** covering INGEST, EMBED, and SCORE phases. All Ol
 
 ## 📈 Data Flow Diagram
 
-![RankAI Data Flow Diagram](./docs/diagrams/data_flow.png)
+[![RankAI System Architecture](./docs/diagrams/data_flow.svg)](./docs/diagrams/data_flow.svg)
 
 <details>
 <summary>ASCII version</summary>
@@ -542,7 +542,7 @@ INPUT                       PIPELINE                              OUTPUT
          │                  │(qwen2.5) │           │
  Job Description            └──────────┘           │
  (.json/.txt)  ─────────────▶ JD Parser            │
-                            ──▶ JobDescription      │
+                             ──▶ JobDescription      │
                                                     ▼
                                             ┌──────────┐
                                             │  ENRICH  │
