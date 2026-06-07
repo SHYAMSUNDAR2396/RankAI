@@ -33,6 +33,11 @@ RankAI evaluates candidates the way a real hiring panel would — three AI perso
 
 ## 📐 Architecture
 
+[![RankAI System Architecture](./docs/diagrams/architecture.png)](./docs/diagrams/architecture.png)
+
+<details>
+<summary>ASCII version</summary>
+
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
 │                      React Dashboard (Vite + TS)                     │
@@ -55,13 +60,23 @@ RankAI evaluates candidates the way a real hiring panel would — three AI perso
 │  │        │  │        │  │ STORE   │  │       │  │ OUTPUT       │   │
 │  └───┬────┘  └───┬────┘  └────┬────┘  └───┬───┘  └──────┬───────┘   │
 │      ▼           ▼            ▼            ▼             ▼           │
-│  ┌────────┐  ┌────────┐  ┌────────┐  ┌──────────┐  ┌────────────┐   │
-│  │ Ollama │  │ Ollama │  │ChromaDB│  │ Ollama   │  │ ranked.csv │   │
-│  │ qwen   │  │deepseek│  │ Vector │  │ 3 Models │  │ audit.json │   │
-│  │ 2.5:7b │  │ r1:7b  │  │ Store  │  │(3 pers.) │  │            │   │
-│  └────────┘  └────────┘  └────────┘  └──────────┘  └────────────┘   │
+│  ┌─────────────────────────────────────────────────────────────────┐  │
+│  │             LLM Backend Switch (config.LLM_BACKEND)            │  │
+│  │  ┌───────────────────────┐   ┌───────────────────────────────┐ │  │
+│  │  │ ☁️  Groq API (cloud)   │   │ 🖥️  Ollama (local)            │ │  │
+│  │  │ llama-3.3-70b         │   │ qwen2.5:7b, llama3.1:8b      │ │  │
+│  │  │ llama-3.1-8b-instant  │   │ deepseek-r1:7b, qwen2.5:14b  │ │  │
+│  │  └───────────────────────┘   └───────────────────────────────┘ │  │
+│  └─────────────────────────────────────────────────────────────────┘  │
+│                          ┌────────┐  ┌────────────┐                  │
+│                          │ChromaDB│  │ ranked.csv │                  │
+│                          │ Vector │  │ audit.json │                  │
+│                          │ Store  │  │            │                  │
+│                          └────────┘  └────────────┘                  │
 └──────────────────────────────────────────────────────────────────────┘
 ```
+
+</details>
 
 ---
 
@@ -157,7 +172,12 @@ RankAI assigns each AI agent the model best suited to its cognitive load, rather
 
 ## 🔄 Pipeline Workflow
 
+<!-- ![RankAI Pipeline Workflow](./docs/diagrams/pipeline_workflow.png) -->
+
 The pipeline runs 6 phases in strict sequence. Here is the complete end-to-end workflow annotated with timestamps from a real 15-candidate run:
+
+<details>
+<summary>ASCII version</summary>
 
 ```
 ╔══════════════════════════════════════════════════════════════════════════╗
@@ -168,10 +188,9 @@ The pipeline runs 6 phases in strict sequence. Here is the complete end-to-end w
  ┌─────────────────────────────────────────────────────────────────────┐
  │  PHASE 0 — STARTUP VERIFICATION                         [~1 sec]  │
  │                                                                     │
- │  ① Connect to Ollama server at localhost:11434                      │
- │  ② Verify all 5 LLM models are pulled:                             │
- │     deepseek-r1:7b, llama3.2:3b, qwen2.5:14b,                     │
- │     qwen2.5:7b, llama3.1:8b                                       │
+ │  ① Detect LLM backend: Ollama (local) or Groq (cloud)              │
+ │  ② If Ollama: connect to localhost:11434, verify 5 models pulled   │
+ │     If Groq:  validate GROQ_API_KEY is set                         │
  │  ③ Verify embedding model: BAAI/bge-large-en-v1.5                  │
  │  ④ Initialize ChromaDB collections:                                │
  │     jd_requirements, candidate_profiles, calibration_examples       │
@@ -318,6 +337,8 @@ The pipeline runs 6 phases in strict sequence. Here is the complete end-to-end w
  │    audited: 3  |  flagged: 3  |  flag_rate: 100%                    │
  └─────────────────────────────────────────────────────────────────────┘
 ```
+
+</details>
 
 ---
 
@@ -506,6 +527,11 @@ The suite includes **76 tests** covering INGEST, EMBED, and SCORE phases. All Ol
 
 ## 📈 Data Flow Diagram
 
+![RankAI Data Flow Diagram](./docs/diagrams/data_flow.png)
+
+<details>
+<summary>ASCII version</summary>
+
 ```
 INPUT                       PIPELINE                              OUTPUT
 ─────                       ────────                              ──────
@@ -538,6 +564,11 @@ INPUT                       PIPELINE                              OUTPUT
                                      │          │          │
                                      └──────────┼──────────┘
                                                 ▼
+                                    ┌───────────────────────┐
+                                    │  ⚡ LLM Backend Switch │
+                                    │  Ollama ←──or──▶ Groq │
+                                    └───────────┬───────────┘
+                                                ▼
                                           ┌──────────┐
                                           │  SCORE   │
                                           │ 3 models │
@@ -563,6 +594,8 @@ INPUT                       PIPELINE                              OUTPUT
                                              ▼
                                    React Dashboard (Vite)
 ```
+
+</details>
 
 ---
 
