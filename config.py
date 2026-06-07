@@ -16,6 +16,14 @@ Constant groups:
 
 from __future__ import annotations
 
+import os
+
+# Backend selection: "ollama" or "groq"
+LLM_BACKEND: str = os.environ.get("LLM_BACKEND", "ollama").lower()
+
+# Groq API Configuration
+GROQ_API_KEY: str = os.environ.get("GROQ_API_KEY", "")
+
 # ---------------------------------------------------------------------------
 # Backend and model selection
 # ---------------------------------------------------------------------------
@@ -34,6 +42,20 @@ OLLAMA_MODELS = {
     "narrative":        "llama3.2:3b",     # 3-sentence summary
 }
 
+# Groq models optimized for tasks
+GROQ_MODELS = {
+    "parser":           "llama-3.3-70b-versatile",
+    "jd_parser":        "llama-3.3-70b-versatile",
+    "orchestrator":     "llama-3.3-70b-versatile",
+    "skills_match":     "llama-3.1-8b-instant",
+    "trajectory":       "llama-3.3-70b-versatile",
+    "hiring_manager":   "llama-3.3-70b-versatile",
+    "peer_interviewer": "llama-3.3-70b-versatile",
+    "devils_advocate":  "llama-3.3-70b-versatile",
+    "consensus":        "llama-3.1-8b-instant",
+    "narrative":        "llama-3.1-8b-instant",
+}
+
 # Hardware-aware override — set True on low-RAM machines (< 20GB)
 LOW_MEMORY_MODE = False  # Set True on Intel 16GB machines
 
@@ -47,6 +69,8 @@ OLLAMA_MODELS_LOW_MEM = {
 
 def get_model(agent_name: str) -> str:
     """Return the appropriate model for a given agent name."""
+    if LLM_BACKEND == "groq":
+        return GROQ_MODELS.get(agent_name, "llama-3.1-8b-instant")
     model_map = OLLAMA_MODELS_LOW_MEM if LOW_MEMORY_MODE else OLLAMA_MODELS
     return model_map.get(agent_name, "llama3.2:3b")
 

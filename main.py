@@ -354,7 +354,9 @@ def check_models_present() -> None:
 def verify_startup(timeout: float = 10.0) -> None:
     """Run all startup verification checks in order.
 
-    First confirms the Ollama server is reachable (:func:`check_ollama_reachable`),
+    When LLM_BACKEND is "groq", it confirms the GROQ_API_KEY environment
+    variable is set and validates sentence-transformers package installation.
+    Otherwise, it confirms the Ollama server is reachable (:func:`check_ollama_reachable`),
     then confirms the required models are installed locally
     (:func:`check_models_present`). Either check exits the process on failure, so
     returning normally means the pipeline is safe to run (Requirements 9.2, 9.3,
@@ -371,8 +373,32 @@ def verify_startup(timeout: float = 10.0) -> None:
         SystemExit: Propagated from a failing check when the server is
             unreachable or a required model is missing.
     """
-    check_ollama_reachable(timeout=timeout)
-    check_models_present()
+    if config.LLM_BACKEND == "groq":
+        import os
+        api_key = config.GROQ_API_KEY or os.environ.get("GROQ_API_KEY")
+        if not api_key:
+            logger.error("GROQ_API_KEY is not set. A Groq API key is required when LLM_BACKEND is 'groq'.")
+            print("ERROR: GROQ_API_KEY is not set.", file=sys.stderr)
+            sys.exit(_EXIT_FAILURE)
+
+        if not config.EMBEDDING_MODEL:
+            logger.error("Embedding model (config.EMBEDDING_MODEL is not set)")
+            print("ERROR: config.EMBEDDING_MODEL is not set", file=sys.stderr)
+            sys.exit(_EXIT_FAILURE)
+
+        try:
+            import importlib.util
+            if importlib.util.find_spec("sentence_transformers") is None:
+                logger.error("sentence-transformers package is missing.")
+                print("ERROR: sentence-transformers package is missing.", file=sys.stderr)
+                sys.exit(_EXIT_FAILURE)
+        except Exception as exc:  # noqa: BLE001
+            logger.debug("Could not probe sentence_transformers: %s", exc)
+
+        logger.info("Startup check passed for Groq backend.")
+    else:
+        check_ollama_reachable(timeout=timeout)
+        check_models_present()
 
 
 def _load_candidates_from_dir(

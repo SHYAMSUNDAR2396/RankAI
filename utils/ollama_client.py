@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import re
 import time
 from typing import Any
@@ -31,6 +32,11 @@ from typing import Any
 import ollama
 
 import config
+
+try:
+    from groq import Groq
+except ImportError:
+    Groq = None
 
 logger = logging.getLogger(__name__)
 
@@ -96,6 +102,20 @@ class OllamaClient:
         """
         self.host: str = host if host is not None else config.OLLAMA_HOST
         self.model: str = model if model is not None else OLLAMA_MODEL_DEFAULT
+        self.groq_client = None
+
+        if config.LLM_BACKEND == "groq":
+            if Groq is None:
+                raise ImportError(
+                    "The 'groq' package is required when LLM_BACKEND is set to 'groq'. "
+                    "Install it using: pip install groq"
+                )
+            api_key = config.GROQ_API_KEY or os.environ.get("GROQ_API_KEY")
+            if not api_key:
+                raise ValueError(
+                    "GROQ_API_KEY must be set when LLM_BACKEND is set to 'groq'."
+                )
+            self.groq_client = Groq(api_key=api_key)
 
     def chat(
         self,
@@ -105,7 +125,7 @@ class OllamaClient:
         max_tokens: int | None = None,
         model: str | None = None,
     ) -> str:
-        """Call ``ollama.chat`` with retry/backoff and return the content string.
+        """Call LLM chat with retry/backoff and return the content string.
 
         Retries on any raised exception or a falsy/empty response up to two
         additional times (three attempts total). Before each retry it sleeps
@@ -115,16 +135,16 @@ class OllamaClient:
         level on each call (Requirement 13.6).
 
         Args:
-            messages: Chat messages in the Ollama format, e.g.
+            messages: Chat messages in the Ollama/Groq format, e.g.
                 ``[{"role": "user", "content": "..."}]``.
             temperature: Sampling temperature. When ``None`` it defaults to
                 ``config.SCORING_TEMPERATURE``.
             max_tokens: Maximum tokens to generate. When ``None`` the
-                ``num_predict`` option is omitted and the model default applies.
+                model default applies.
             model: Optional per-call model override.
 
         Returns:
-            The response content string from ``response["message"]["content"]``.
+            The response content string.
 
         Raises:
             OllamaCallError: When the initial attempt and both retries fail
@@ -133,33 +153,65 @@ class OllamaClient:
         if temperature is None:
             temperature = config.SCORING_TEMPERATURE
 
-        options: dict[str, Any] = {"temperature": temperature}
-        if max_tokens is not None:
-            options["num_predict"] = max_tokens
-
         resolved_model = model or self.model
+        use_groq = config.LLM_BACKEND == "groq"
 
-        logger.debug(
-            "ollama.chat request: model=%s host=%s options=%s messages=%s",
-            resolved_model,
-            self.host,
-            options,
-            messages,
-        )
+        if use_groq:
+            logger.debug(
+                "groq.chat request: model=%s temperature=%s max_tokens=%s messages=%s",
+                resolved_model,
+                temperature,
+                max_tokens,
+                messages,
+            )
+        else:
+            options: dict[str, Any] = {"temperature": temperature}
+            if max_tokens is not None:
+                options["num_predict"] = max_tokens
+
+            logger.debug(
+                "ollama.chat request: model=%s host=%s options=%s messages=%s",
+                resolved_model,
+                self.host,
+                options,
+                messages,
+            )
 
         last_error: Exception | None = None
         for attempt in range(1, _MAX_ATTEMPTS + 1):
             try:
-                response = ollama.chat(
-                    model=resolved_model,
-                    messages=messages,
-                    options=options,
-                )
-                content = self._extract_content(response)
+                if use_groq:
+                    if self.groq_client is None:
+                        if Groq is None:
+                            raise ImportError(
+                                "The 'groq' package is required when LLM_BACKEND is set to 'groq'."
+                            )
+                        api_key = config.GROQ_API_KEY or os.environ.get("GROQ_API_KEY")
+                        if not api_key:
+                            raise ValueError(
+                                "GROQ_API_KEY must be set when LLM_BACKEND is set to 'groq'."
+                            )
+                        self.groq_client = Groq(api_key=api_key)
+
+                    response = self.groq_client.chat.completions.create(
+                        model=resolved_model,
+                        messages=messages,
+                        temperature=temperature,
+                        max_tokens=max_tokens,
+                    )
+                    content = response.choices[0].message.content
+                else:
+                    response = ollama.chat(
+                        model=resolved_model,
+                        messages=messages,
+                        options=options,
+                    )
+                    content = self._extract_content(response)
+
                 if not content:
-                    raise OllamaCallError("Ollama returned an empty response")
+                    raise OllamaCallError(f"{'groq' if use_groq else 'ollama'}.chat returned an empty response")
                 logger.debug(
-                    "ollama.chat response (attempt %d/%d): %r",
+                    "groq.chat response (attempt %d/%d): %r" if use_groq else "ollama.chat response (attempt %d/%d): %r",
                     attempt,
                     _MAX_ATTEMPTS,
                     content,
@@ -168,7 +220,7 @@ class OllamaClient:
             except Exception as exc:  # noqa: BLE001 - retry on any failure
                 last_error = exc
                 logger.debug(
-                    "ollama.chat attempt %d/%d failed: %s",
+                    "groq.chat attempt %d/%d failed: %s" if use_groq else "ollama.chat attempt %d/%d failed: %s",
                     attempt,
                     _MAX_ATTEMPTS,
                     exc,
@@ -176,12 +228,12 @@ class OllamaClient:
                 if attempt < _MAX_ATTEMPTS:
                     backoff = 2 ** (attempt - 1)
                     logger.debug(
-                        "backing off %ds before ollama.chat retry", backoff
+                        "backing off %ds before groq.chat retry" if use_groq else "backing off %ds before ollama.chat retry", backoff
                     )
                     time.sleep(backoff)
 
         raise OllamaCallError(
-            f"ollama.chat failed after {_MAX_ATTEMPTS} attempts"
+            f"{'groq' if use_groq else 'ollama'}.chat failed after {_MAX_ATTEMPTS} attempts"
         ) from last_error
 
     def chat_json(

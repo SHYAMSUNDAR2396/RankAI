@@ -14,6 +14,7 @@ spacy>=3.7.0                  # en_core_web_sm name/email fallback (Requirement 
 pandas>=2.2.0                 # ranked_candidates.csv writer (Requirement 8.3)
 pydantic>=2.7.0               # Pydantic v2 data models (Requirements 2.9, 3.8)
 rich>=13.7.0                  # CLI progress bar + tables (Requirements 9.7, 9.8)
+groq>=0.9.0                   # Groq API client integration (Requirement 1.11 alternative backend)
 
 # --- Development / testing ---
 pytest>=8.2.0                 # test runner (Requirement 12)
