@@ -37,3 +37,21 @@ frontend/pnpm-debug.log*
 *.njsproj
 *.sln
 *.swp
+
+# AI/Claude tooling
+.claude/
+.omo/
+.kiro/
+.hypothesis/
+
+# Competition data (large, not for repo)
+indiaruns/
+
+# Design artifacts (generated, not source)
+stitch_rankai_candidate_ranking_dashboard/
+stitch_rankai_candidate_ranking_dashboard-2/
+
+# Misc junk files
+python .main.py.txt
+frontend/pnpm-lock.yaml
+*.log

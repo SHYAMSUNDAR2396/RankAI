@@ -770,3 +770,182 @@ class JdParser:
                     exc,
                 )
         return requirements
+
+
+# ---------------------------------------------------------------------------
+# Competition mode: streaming JSONL loader
+# ---------------------------------------------------------------------------
+
+
+def load_candidates_jsonl(
+    path: str | Path,
+    *,
+    max_candidates: int | None = None,
+) -> Iterator[CandidateProfile]:
+    """Stream candidates from a competition-format JSONL file.
+
+    Each line is a JSON object matching the competition ``candidate_schema.json``
+    structure (``profile``, ``career_history``, ``education``, ``skills``,
+    ``certifications``, ``languages``, ``redrob_signals``).  This function
+    performs *no LLM inference* — the mapping to :class:`CandidateProfile` is
+    purely structural.
+
+    Args:
+        path: Path to the ``.jsonl`` file.
+        max_candidates: Optional cap; stop after yielding this many profiles.
+            ``None`` means read until EOF.
+
+    Yields:
+        Validated :class:`CandidateProfile` instances.  Lines that fail
+        validation are logged and skipped (fail-open, consistent with the
+        existing INGEST philosophy).
+    """
+    from models.candidate import RedrobSignals
+
+    path = Path(path)
+    logger.info("Loading candidates from JSONL: %s", path)
+
+    count = 0
+    skipped = 0
+
+    with open(path, encoding="utf-8") as fh:
+        for line_no, raw_line in enumerate(fh, start=1):
+            line = raw_line.strip()
+            if not line:
+                continue
+
+            if max_candidates is not None and count >= max_candidates:
+                logger.info(
+                    "Reached max_candidates=%d — stopping JSONL load",
+                    max_candidates,
+                )
+                break
+
+            try:
+                row: dict[str, Any] = json.loads(line)
+            except json.JSONDecodeError as exc:
+                logger.warning("Skipping malformed JSON on line %d: %s", line_no, exc)
+                skipped += 1
+                continue
+
+            try:
+                profile = _map_competition_row(row, line_no)
+                count += 1
+                yield profile
+            except Exception as exc:
+                logger.warning(
+                    "Skipping invalid candidate on line %d: %s", line_no, exc
+                )
+                skipped += 1
+
+    logger.info(
+        "JSONL load complete: %d candidates loaded, %d skipped", count, skipped
+    )
+
+
+def _map_competition_row(row: dict[str, Any], line_no: int) -> CandidateProfile:
+    """Map a single competition JSONL row to a :class:`CandidateProfile`.
+
+    The competition schema stores fields like ``career_history`` (list of
+    dicts) and ``redrob_signals`` (dict) which differ from the internal
+    ``CandidateProfile`` shape.  This mapper bridges the gap.
+
+    Raises:
+        KeyError: If ``candidate_id`` or ``profile`` is missing (caller logs
+            and skips).
+    """
+    from models.candidate import RedrobSignals
+
+    # --- candidate_id (required) ---
+    candidate_id = str(row.get("candidate_id") or row.get("id") or "")
+    if not candidate_id:
+        raise KeyError("Missing candidate_id")
+
+    # --- profile sub-object ---
+    profile_data = row.get("profile", row)  # fallback to top-level
+
+    name = profile_data.get("name", "")
+    email = profile_data.get("email")
+    years_experience = float(profile_data.get("years_of_experience", 0))
+    headline = profile_data.get("headline", "")
+    summary = profile_data.get("summary", "")
+    location = profile_data.get("location", "")
+
+    # --- career_history → roles ---
+    roles: list[CandidateRole] = []
+    for entry in row.get("career_history", row.get("roles", [])):
+        if not isinstance(entry, dict):
+            continue
+        start = entry.get("start_date", "")
+        end = entry.get("end_date")
+        duration = int(entry.get("duration_months", 0))
+        if not duration and start:
+            # compute duration if end is present and start is parseable
+            if end:
+                try:
+                    sy, sm = map(int, start[:7].split("-"))
+                    ey, em = map(int, end[:7].split("-"))
+                    duration = max(0, (ey - sy) * 12 + (em - sm))
+                except Exception:
+                    pass
+
+        roles.append(
+            CandidateRole(
+                title=entry.get("title", entry.get("job_title", "")),
+                company=entry.get("company", entry.get("company_name", "")),
+                start_date=start,
+                end_date=end,
+                duration_months=duration,
+                company_size_estimate=entry.get("company_size_estimate"),
+                scope_keywords=entry.get("scope_keywords", []),
+            )
+        )
+
+    # --- skills ---
+    raw_skills = row.get("skills", [])
+    skills_claimed: list[str] = []
+    for s in raw_skills:
+        if isinstance(s, str):
+            skills_claimed.append(s)
+        elif isinstance(s, dict):
+            skills_claimed.append(s.get("name", ""))
+
+    # --- education ---
+    education: list[dict] = []
+    for edu in row.get("education", []):
+        if isinstance(edu, dict):
+            education.append(edu)
+
+    # --- redrob_signals ---
+    signals_data = row.get("redrob_signals")
+    redrob_signals: RedrobSignals | None = None
+    if isinstance(signals_data, dict):
+        try:
+            redrob_signals = RedrobSignals(**signals_data)
+        except Exception:
+            # Partial signals — populate what we can
+            try:
+                redrob_signals = RedrobSignals.model_validate(signals_data)
+            except Exception:
+                logger.debug(
+                    "Line %d: could not parse redrob_signals, skipping field",
+                    line_no,
+                )
+
+    # --- build raw_text fallback for downstream compat ---
+    raw_text = summary or headline or f"{name} {years_experience}yoe"
+
+    return CandidateProfile(
+        candidate_id=candidate_id,
+        name=name,
+        email=email,
+        years_experience=years_experience,
+        roles=roles,
+        skills_claimed=skills_claimed,
+        education=education,
+        trajectory_vector=None,
+        raw_text=raw_text,
+        source_file=f"jsonl:line:{line_no}",
+        is_complete=True,
+        redrob_signals=redrob_signals,
+    )

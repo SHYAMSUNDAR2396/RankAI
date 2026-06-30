@@ -331,3 +331,197 @@ CALIBRATION_EXAMPLES: list[dict[str, str]] = [
         ),
     },
 ]
+
+
+# ---------------------------------------------------------------------------
+# Competition mode: deterministic scoring weights & honeypot thresholds
+# ---------------------------------------------------------------------------
+
+#: Feature dimension weights for the competition scoring engine.
+#: Must sum to 1.0.  All scoring is deterministic — no LLM calls.
+COMPETITION_WEIGHTS: dict[str, float] = {
+    "skill_match": 0.35,
+    "experience_fit": 0.25,
+    "behavioral_signals": 0.20,
+    "trajectory_education": 0.20,
+}
+
+#: Optimal YOE range for the Senior AI Engineer role.
+COMPETITION_OPTIMAL_YOE_MIN: float = 5.0
+COMPETITION_OPTIMAL_YOE_MAX: float = 9.0
+
+#: Honeypot detection thresholds.
+HONEYPOT_CAREER_IMPOSSIBILITY_THRESHOLD: float = 2.0  # years overlap ratio
+HONEYPOT_SKILL_CONSISTENCY_MIN: int = 3  # min endorsements for "expert"
+HONEYPOT_YOE_CAREER_MISMATCH_YEARS: float = 3.0
+HONEYPOT_HONEYPOT_RATE_DISQUALIFY: float = 0.10  # >10% in top 100 = DQ
+
+#: Senior AI Engineer job requirement keywords (case-insensitive).
+#: Used by the skill-matching scorer to compute overlap with candidate skills.
+COMPETITION_MUST_HAVE_SKILLS: list[str] = [
+    "embeddings", "retrieval", "ranking", "llm", "fine-tuning",
+    "pytorch", "transformers", "rag", "vector",
+]
+COMPETITION_NICE_TO_HAVE_SKILLS: list[str] = [
+    "fastapi", "kubernetes", "docker", "mlops", "production",
+    "evaluation", "a/b testing", "startup",
+]
+
+#: Career trajectory keywords for the trajectory/education scorer.
+COMPETITION_TRAJECTORY_KEYWORDS: list[str] = [
+    "lead", "senior", "staff", "principal", "architect",
+    "founded", "built", "scaled", "launched", "shipped",
+]
+
+
+# ---------------------------------------------------------------------------
+# Competition mode: title / company / education / location intelligence
+# ---------------------------------------------------------------------------
+
+#: Title relevance scores — higher means more aligned with the Senior AI Engineer role.
+#: Titles not listed score 0.3 (unknown, neutral).
+COMPETITION_TITLE_SCORES: dict[str, float] = {
+    # Core AI/ML roles (strong match)
+    "ai engineer": 1.0,
+    "ml engineer": 1.0,
+    "machine learning engineer": 1.0,
+    "data scientist": 0.9,
+    "research scientist": 0.7,
+    "research engineer": 0.8,
+    # Software engineering with AI focus
+    "senior software engineer": 0.75,
+    "staff engineer": 0.8,
+    "staff software engineer": 0.8,
+    "principal engineer": 0.85,
+    "software engineer": 0.65,
+    "backend engineer": 0.6,
+    "full stack engineer": 0.55,
+    "full-stack engineer": 0.55,
+    "platform engineer": 0.6,
+    "infrastructure engineer": 0.55,
+    # Data engineering (adjacent)
+    "data engineer": 0.6,
+    "analytics engineer": 0.5,
+    # Leadership (if technical background)
+    "engineering manager": 0.65,
+    "vp engineering": 0.6,
+    "head of engineering": 0.6,
+    "director of engineering": 0.6,
+    # Clearly non-technical (low match)
+    "marketing manager": 0.15,
+    "operations manager": 0.15,
+    "accountant": 0.05,
+    "hr manager": 0.1,
+    "business analyst": 0.2,
+    "project manager": 0.15,
+    "content writer": 0.1,
+    "customer support": 0.1,
+    "civil engineer": 0.1,
+    "mechanical engineer": 0.1,
+    "electrical engineer": 0.15,
+    "sales": 0.1,
+    "consultant": 0.15,
+}
+
+#: Consulting firms explicitly mentioned in the JD as "not a fit" if entire career.
+COMPETITION_CONSULTING_FIRMS: set[str] = {
+    "tcs", "infosys", "wipro", "accenture", "cognizant", "capgemini",
+    "deloitte", "ey", "pwc", "kpmg", "mckinsey", "bcg", "bain",
+    "tech mahindra", "hcl", "ltimindtree", "mindtree", "mpHASis",
+    "hexaware", "mphasis", "dxc technology", "ibm consulting",
+}
+
+#: Education field relevance — how well a degree field aligns with AI/ML engineering.
+COMPETITION_EDUCATION_FIELD_SCORES: dict[str, float] = {
+    # Strong alignment
+    "computer science": 1.0,
+    "artificial intelligence": 1.0,
+    "machine learning": 1.0,
+    "data science": 0.9,
+    "computer engineering": 0.9,
+    "computer science and engineering": 1.0,
+    "information technology": 0.7,
+    "software engineering": 0.85,
+    # Moderate alignment
+    "electronics": 0.5,
+    "electronics and communication": 0.5,
+    "electrical engineering": 0.45,
+    "mathematics": 0.5,
+    "statistics": 0.55,
+    "applied mathematics": 0.6,
+    "computational linguistics": 0.7,
+    # Low alignment
+    "mechanical engineering": 0.2,
+    "civil engineering": 0.15,
+    "chemical engineering": 0.1,
+    "biotechnology": 0.15,
+    "bioinformatics": 0.3,
+}
+
+#: India locations — candidates in these cities/regions get a boost.
+COMPETITION_INDIA_LOCATIONS: set[str] = {
+    "pune", "noida", "gurgaon", "bangalore", "bengaluru", "hyderabad",
+    "mumbai", "delhi", "chennai", "kolkata", "ahmedabad", "jaipur",
+    "lucknow", "indore", "nagpur", "coimbatore", "kochi", "thiruvananthapuram",
+}
+
+#: Keywords in career descriptions that signal relevant ML/search/ranking experience.
+COMPETITION_CAREER_DESCRIPTION_KEYWORDS: dict[str, float] = {
+    # High-signal keywords (building ranking/search/recommendation systems)
+    "ranking system": 1.0,
+    "search system": 0.95,
+    "recommendation system": 0.9,
+    "retrieval system": 0.95,
+    "embedding": 0.8,
+    "vector database": 0.85,
+    "vector search": 0.9,
+    "semantic search": 0.9,
+    "hybrid search": 0.85,
+    "reranking": 0.9,
+    "learning to rank": 1.0,
+    "ndcg": 0.95,
+    "bm25": 0.8,
+    "tf-idf": 0.7,
+    "annoy": 0.75,
+    "faiss": 0.85,
+    "pinecone": 0.8,
+    "weaviate": 0.8,
+    "qdrant": 0.8,
+    "milvus": 0.8,
+    "elasticsearch": 0.6,
+    "opensearch": 0.65,
+    # ML deployment / production signals
+    "production": 0.6,
+    "deployed": 0.5,
+    "a/b test": 0.6,
+    "ab test": 0.6,
+    "evaluation framework": 0.7,
+    "offline evaluation": 0.7,
+    "online evaluation": 0.65,
+    "latency": 0.4,
+    "throughput": 0.4,
+    "scale": 0.4,
+    # LLM-specific
+    "fine-tuning": 0.7,
+    "finetuning": 0.7,
+    "lora": 0.75,
+    "qlora": 0.75,
+    "peft": 0.7,
+    "prompt engineering": 0.4,
+    "rag": 0.85,
+    "retrieval augmented": 0.85,
+    "llm": 0.6,
+    "large language model": 0.65,
+    # Negative signals (research-only, no production)
+    "research paper": -0.3,
+    "published paper": -0.2,
+    "academic": -0.3,
+    "thesis": -0.2,
+}
+
+#: Anti-pattern detection: keywords that signal "keyword stuffing" when title is non-technical.
+COMPETITION_STUFFING_TITLE_KEYWORDS: set[str] = {
+    "marketing manager", "operations manager", "accountant", "hr manager",
+    "business analyst", "project manager", "content writer", "customer support",
+    "sales", "consultant", "civil engineer", "mechanical engineer",
+}

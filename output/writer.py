@@ -223,3 +223,51 @@ def write_ranked_csv(results: list[dict], output_dir: Path) -> Path:
 
     logger.info("Wrote ranked output for %d candidates to %s", len(rows), target)
     return target
+
+
+# ---------------------------------------------------------------------------
+# Competition mode: 4-column submission CSV
+# ---------------------------------------------------------------------------
+
+_COMPETITION_CSV_FILENAME = "submission.csv"
+_COMPETITION_COLUMNS = ["candidate_id", "rank", "score", "reasoning"]
+
+
+def write_competition_csv(
+    ranked: list[dict],
+    output_path: Path,
+) -> Path:
+    """Write competition-format submission CSV.
+
+    Exactly 4 columns: ``candidate_id``, ``rank``, ``score``, ``reasoning``.
+    Scores are 0–1, monotonically non-increasing. Reasoning is ≤ 400 chars.
+
+    Args:
+        ranked: Already-ranked list of dicts, each with ``candidate_id``,
+            ``score`` (0–1), and ``reasoning`` (≤ 400 chars). Must be sorted
+            descending by score before calling.
+        output_path: Destination ``submission.csv`` path.
+
+    Returns:
+        Path to the written file.
+    """
+    import pandas as pd
+
+    output_path = Path(output_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    rows = []
+    for i, entry in enumerate(ranked, start=1):
+        rows.append(
+            {
+                "candidate_id": entry["candidate_id"],
+                "rank": i,
+                "score": round(float(entry["score"]), 6),
+                "reasoning": str(entry.get("reasoning", ""))[:400],
+            }
+        )
+
+    frame = pd.DataFrame(rows, columns=_COMPETITION_COLUMNS)
+    frame.to_csv(output_path, index=False)
+    logger.info("Wrote competition CSV (%d rows) to %s", len(rows), output_path)
+    return output_path
