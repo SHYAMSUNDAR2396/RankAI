@@ -26,6 +26,71 @@ from __future__ import annotations
 from pydantic import BaseModel, Field
 
 
+class RedrobSignals(BaseModel):
+    """Redrob behavioral/engagement signals for a candidate.
+
+    Extracted from the candidate_schema.json competition format. These are
+    deterministic signals provided by the Redrob platform — no LLM inference
+    needed. All fields have safe defaults so missing data degrades gracefully.
+
+    Attributes:
+        profile_completeness_score: Profile completeness on 0–100 scale.
+        open_to_work_flag: Whether the candidate is actively looking.
+        recruiter_response_rate: How often the candidate responds (0.0–1.0).
+        avg_response_time_hours: Average hours to respond (≥0).
+        skill_assessment_scores: Dict of skill → score (e.g. ``{"python": 85}``).
+        interview_completion_rate: Fraction of interviews completed (0.0–1.0).
+        notice_period_days: Notice period in days (0–180).
+        expected_salary_range_inr_lpa: Min/max salary in INR LPA.
+        preferred_work_mode: One of ``"remote"``, ``"hybrid"``, ``"onsite"``,
+            or ``"flexible"``.
+        last_active_date: ISO date string of last platform activity.
+        github_activity_score: GitHub engagement on −1 to 100 scale.
+        github_public_repos: Number of public repos.
+        github_recent_commits_6m: Commits in the last 6 months.
+        blog_posts_count: Number of published blog posts.
+        online_presence_score: Cross-platform presence score.
+        connection_count: Professional network connections.
+        endorsements_received: Skill endorsements received.
+        certifications_count: Professional certifications held.
+        patent_count: Patents filed.
+        publications_count: Academic/professional publications.
+        speaking_engagements: Conference/talk appearances.
+        awards_count: Awards received.
+        profile_views_received_30d: Profile views in last 30 days.
+        applications_submitted_30d: Applications in last 30 days.
+        active_job_titles_count: Number of distinct job titles applied to.
+        recruiter_outreach_count_6m: Recruiter messages in last 6 months.
+    """
+
+    profile_completeness_score: float = 0.0
+    open_to_work_flag: bool = False
+    recruiter_response_rate: float = 0.0
+    avg_response_time_hours: float = 0.0
+    skill_assessment_scores: dict[str, float] = Field(default_factory=dict)
+    interview_completion_rate: float = 0.0
+    notice_period_days: int = 0
+    expected_salary_range_inr_lpa: dict[str, float] = Field(default_factory=dict)
+    preferred_work_mode: str = "flexible"
+    last_active_date: str | None = None
+    github_activity_score: float = 0.0
+    github_public_repos: int = 0
+    github_recent_commits_6m: int = 0
+    blog_posts_count: int = 0
+    online_presence_score: float = 0.0
+    connection_count: int = 0
+    endorsements_received: int = 0
+    certifications_count: int = 0
+    patent_count: int = 0
+    publications_count: int = 0
+    speaking_engagements: int = 0
+    awards_count: int = 0
+    profile_views_received_30d: int = 0
+    applications_submitted_30d: int = 0
+    active_job_titles_count: int = 0
+    recruiter_outreach_count_6m: int = 0
+
+
 class CandidateRole(BaseModel):
     """One employment entry in a candidate's work history.
 
@@ -133,3 +198,4 @@ class CandidateProfile(BaseModel):
     raw_text: str = ""
     source_file: str = ""
     is_complete: bool = False
+    redrob_signals: RedrobSignals | None = None
