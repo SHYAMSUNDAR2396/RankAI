@@ -49,6 +49,9 @@ DISQUALIFIER_CONSULTING_FIRMS: Set[str] = {
 LOCATION_BONUS_CITIES: Set[str] = {
     "pune", "noida", "gurgaon", "gurugram", "mumbai", "bombay",
     "delhi", "new delhi", "delhi ncr", "hyderabad", "bangalore", "bengaluru",
+    "chennai", "kolkata", "bhubaneswar", "chandigarh",
+    "visakhapatnam", "vizag", "trivandrum", "cochin",
+    "jaipur", "ahmedabad",
 }
 
 #: Indian cities still in scope per JD (case-by-case for other metros).
@@ -56,6 +59,12 @@ LOCATION_OK_CITIES: Set[str] = {
     "chennai", "kolkata", "ahmedabad", "jaipur", "lucknow", "indore",
     "nagpur", "coimbatore", "kochi", "thiruvananthapuram",
 }
+
+#: Public alias for external consumers.
+BONUS_LOCATIONS: Set[str] = LOCATION_BONUS_CITIES
+
+#: Countries whose work authorization is accepted by the JD.
+WORK_AUTHORIZATION_WHITELIST: Set[str] = {"India", "Australia"}
 
 #: Tier-1 schools that the dataset uses internally (tier_1 + tier_2 buckets from schema).
 TIER1_TIER2_INSTITUTIONS: Set[str] = {
@@ -267,6 +276,16 @@ NEGATIVE_CAREER_PATTERNS: Dict[str, float] = {
 # Helpers
 # =============================================================================
 
+def _safe_float(value: Any, default: float = 0.0) -> float:
+    """Safely convert a value to float, returning default for None/non-numeric."""
+    if value is None:
+        return default
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
 def _norm(text: str) -> str:
     """Lowercase + collapse whitespace."""
     return re.sub(r"\s+", " ", text.lower()).strip()
@@ -299,12 +318,13 @@ def _extract_must_have(cand: Dict[str, Any]) -> Tuple[float, List[str], List[str
         " ".join(r.get("description", "") + " " + r.get("title", "") for r in cand.get("career_history", []))
     )
 
-    # 1) Skill list matches
+    # 1) Skill list matches (word-boundary regex to avoid false positives
+    #    e.g. "java" won't match "javascript", "rag" won't match "brag")
     skill_hits = 0
     skill_hits_weighted = 0.0
     matched_skills: List[str] = []
     for pat, weight in MUST_HAVE_SKILL_PATTERNS.items():
-        if pat in skill_names_joined:
+        if re.search(r"\b" + re.escape(pat) + r"\b", skill_names_joined):
             skill_hits += 1
             skill_hits_weighted += weight
             matched_skills.append(pat)
@@ -432,7 +452,7 @@ def _extract_career(cand: Dict[str, Any]) -> Tuple[float, Dict[str, Any]]:
 
 def _extract_experience(cand: Dict[str, Any]) -> Tuple[float, Dict[str, Any]]:
     """Return (experience_fit 0..1, breakdown dict)."""
-    yoe = cand.get("years_of_experience", 0.0)
+    yoe = _safe_float(cand.get("years_of_experience"))
 
     # JD: 5–9 years is the sweet spot; outside gets a soft penalty.
     if 5.0 <= yoe <= 9.0:
@@ -556,7 +576,7 @@ def _extract_logistics(cand: Dict[str, Any]) -> Tuple[float, Dict[str, Any]]:
         loc_score = 0.75
     elif "india" in country:
         loc_score = 0.65
-    elif country in ("united states", "canada", "uk", "united kingdom", "germany", "singapore"):
+    elif country in ("united states", "canada", "uk", "united kingdom", "germany", "singapore", "australia"):
         loc_score = 0.50  # Outside India, case-by-case per JD
     else:
         loc_score = 0.40

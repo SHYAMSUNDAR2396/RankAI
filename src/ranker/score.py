@@ -134,7 +134,7 @@ def score_candidate(cand: Dict[str, Any]) -> ScoredCandidate:
         current_title=cand.get("current_title", ""),
         current_company=cand.get("current_company", ""),
         location=cand.get("location", ""),
-        years_experience=float(cand.get("years_experience", 0.0) or 0.0),
+        years_experience=float(cand.get("years_of_experience", 0.0) or 0.0),
         matched_skills=features.get("matched_skills", []),
         title_bucket=features.get("title_bucket", "unknown_technical"),
         disqualifier_reasons=features.get("disqualifier_reasons", []),
@@ -180,8 +180,8 @@ def select_top_n(
     unsafe = [s for s in scored if not s.is_safe_for_top100]
 
     # Sort both by score desc, then candidate_id asc
-    safe.sort(key=lambda s: (-s.score, s.candidate_id))
-    unsafe.sort(key=lambda s: (-s.score, s.candidate_id))
+    safe.sort(key=lambda s: (-round(s.score, 4), s.candidate_id))
+    unsafe.sort(key=lambda s: (-round(s.score, 4), s.candidate_id))
 
     selected = safe[:n]
     if len(selected) < n:

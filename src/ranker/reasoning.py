@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 #: Maximum reasoning length (per submission_spec.txt Section 2).
-MAX_REASONING_CHARS: int = 380
+MAX_REASONING_CHARS: int = 400
 
 
 # =============================================================================
@@ -51,26 +51,24 @@ def build_reasoning(cand: Dict[str, Any], features: Dict[str, Any]) -> str:
     """
     parts: List[str] = []
 
-    # 1) Title + company + YOE (always present)
+    rank = features.get("_rank", 0)
+    tier = _rank_tier(rank) if rank > 0 else None
+
     title = cand.get("current_title", "").strip() or "Professional"
     company = cand.get("current_company", "").strip()
     yoe = float(cand.get("years_of_experience", 0.0) or 0.0)
 
-    # Build opener
-    if company and yoe:
-        opener = f"{title} at {company} with {yoe:.1f}y"
-    elif company:
-        opener = f"{title} at {company}"
-    elif yoe:
-        opener = f"{title} with {yoe:.1f}y experience"
+    base = _title_company_yoe(title, company, yoe)
+    if tier == "top":
+        opener = f"Exceptional fit: {base}"
+    elif tier == "strong":
+        opener = f"Strong candidate: {base}"
     else:
-        opener = title
+        opener = base
     parts.append(opener)
 
-    # 2) Top matched must-have skills (max 3 — keeps unique + concrete)
     matched = features.get("matched_skills", [])[:3]
     if matched:
-        # Clean skill names for natural language (replace _ with space)
         clean = [_clean_skill_name(s) for s in matched]
         if len(clean) == 1:
             parts.append(f"matched skill: {clean[0]}")
@@ -79,45 +77,37 @@ def build_reasoning(cand: Dict[str, Any], features: Dict[str, Any]) -> str:
         else:
             parts.append(f"matched skills: {', '.join(clean[:-1])}, and {clean[-1]}")
 
-    # 3) Production evidence from career descriptions (if any)
+    jd_phrase = _jd_connection_phrase(features)
+    if jd_phrase:
+        parts.append(jd_phrase)
+
     career = cand.get("career_history", []) or []
     production_evidence = _detect_production_evidence(career)
     if production_evidence and not _evidence_already_in_skills(production_evidence, matched):
         parts.append(production_evidence)
 
-    # 4) Behavioral signal (pick the most informative one)
     sig_phrase = _top_behavioral_phrase(cand)
     if sig_phrase:
         parts.append(sig_phrase)
 
-    # 5) Location (Indian cities get named explicitly)
     location = cand.get("location", "").strip()
     country = cand.get("country", "").strip()
     loc_phrase = _location_phrase(location, country)
     if loc_phrase:
         parts.append(loc_phrase)
 
-    # 6) Honeypot / disqualifier warnings (only if present, kept brief)
     disq_reasons = features.get("disqualifier_reasons", []) or []
-    if disq_reasons:
-        # Don't surface disqualifier in top-rank reasons; only include in lower
-        # ranked candidates (it explains why they're at the bottom).
-        # Skip in top-30 reasonings to keep them positive.
-        pass
+    if disq_reasons and tier in ("solid", "developing"):
+        disq_phrase = _disqualifier_phrase(disq_reasons)
+        if disq_phrase:
+            parts.append(disq_phrase)
 
-    # Join with semicolons (matches sample_submission.csv style)
     text = "; ".join(parts)
-
-    # Truncate to MAX_REASONING_CHARS (be conservative)
-    if len(text) > MAX_REASONING_CHARS:
-        text = text[: MAX_REASONING_CHARS - 1].rstrip(" ,;.") + "."
-
-    return text
+    return _truncate_reasoning(text)
 
 
-def build_reasoning_from_scored(scored) -> str:
+def build_reasoning_from_scored(scored, rank: int = 0) -> str:
     """Convenience: generate reasoning for a :class:`ScoredCandidate`."""
-    # We have to reconstruct a minimal cand dict from scored fields
     cand = {
         "current_title": getattr(scored, "current_title", ""),
         "current_company": getattr(scored, "current_company", ""),
@@ -126,7 +116,10 @@ def build_reasoning_from_scored(scored) -> str:
         "career_history": getattr(scored, "features", {}).get("_career_history", []),
         "signals": getattr(scored, "features", {}).get("_signals", {}),
     }
-    return build_reasoning(cand, scored.features)
+    features = dict(getattr(scored, "features", {}))
+    if rank:
+        features["_rank"] = rank
+    return build_reasoning(cand, features)
 
 
 # =============================================================================
@@ -152,6 +145,93 @@ def _clean_skill_name(s: str) -> str:
     if s.lower() in expansions:
         return expansions[s.lower()]
     return s
+
+
+def _rank_tier(rank: int) -> str:
+    """Return rank tier label for reasoning variation."""
+    if rank <= 10:
+        return "top"
+    elif rank <= 30:
+        return "strong"
+    elif rank <= 60:
+        return "solid"
+    else:
+        return "developing"
+
+
+def _jd_connection_skills() -> dict:
+    """Map JD keywords to candidate feature keys that indicate alignment."""
+    return {
+        "rag_pipeline": ["rag", "nlp", "llm", "transformer", "langchain"],
+        "ranking_systems": ["recommendation", "search", "ranking", "ltr", "xgboost"],
+        "founding_team": ["founder", "startup", "early_stage"],
+        "product_company": [],  # Checked via company_type feature
+    }
+
+
+def _truncate_reasoning(text: str) -> str:
+    if len(text) > MAX_REASONING_CHARS:
+        return text[: MAX_REASONING_CHARS - 1].rstrip(" ,;.") + "."
+    return text
+
+
+def _title_company_yoe(title: str, company: str, yoe: float) -> str:
+    """Build base description from title, company, and YOE."""
+    if company and yoe:
+        return f"{title} at {company} with {yoe:.1f}y"
+    elif company:
+        return f"{title} at {company}"
+    elif yoe:
+        return f"{title} with {yoe:.1f}y experience"
+    else:
+        return title
+
+
+def _jd_connection_phrase(features: Dict[str, Any]) -> Optional[str]:
+    """Generate a brief JD-alignment phrase based on matched skills."""
+    matched_lower = [s.lower() for s in features.get("matched_skills", [])]
+    jd_map = _jd_connection_skills()
+
+    phrases: List[str] = []
+
+    rag_skills = set(jd_map["rag_pipeline"])
+    if any(s in rag_skills for s in matched_lower):
+        phrases.append("aligns with RAG pipeline needs")
+
+    rank_skills = set(jd_map["ranking_systems"])
+    if any(s in rank_skills for s in matched_lower):
+        phrases.append("ranking systems background")
+
+    founder_skills = set(jd_map["founding_team"])
+    if any(s in founder_skills for s in matched_lower):
+        phrases.append("founding team experience")
+
+    if features.get("product_company", 0):
+        phrases.append("product company experience")
+
+    if not phrases:
+        return None
+    return "; ".join(phrases[:2])
+
+
+#: Human-readable labels for disqualifier reasons.
+_DISQUALIFIER_LABELS: Dict[str, str] = {
+    "mostly_consulting": "career primarily in consulting/services",
+    "consulting_heavy": "career primarily in consulting/services",
+    "research_only": "academic/research focus without industry product experience",
+    "title_chaser": "title changes without substantive role progression",
+}
+
+
+def _disqualifier_phrase(disq_reasons: List[str]) -> Optional[str]:
+    """Surface disqualifiers as brief, factual warnings (max 2)."""
+    labels: List[str] = []
+    for reason in disq_reasons[:2]:
+        label = _DISQUALIFIER_LABELS.get(reason, reason.replace("_", " "))
+        labels.append(label)
+    if not labels:
+        return None
+    return "Note: " + "; ".join(labels)
 
 
 def _detect_production_evidence(career: List[Dict[str, Any]]) -> Optional[str]:

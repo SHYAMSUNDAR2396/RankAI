@@ -2,12 +2,12 @@
 """CLI entry point for the competition-mode ranking pipeline.
 
 Reads ``candidates.jsonl``, scores every candidate with zero LLM calls,
-and writes ``submission.csv`` — the 100-row, 4-column file required by the
+and writes ``rankai.csv`` — the 100-row, 4-column file required by the
 India Runs data-and-AI challenge.
 
 Usage::
 
-    python rank.py --candidates ./candidates.jsonl --out ./submission.csv
+    python rank.py --candidates ./candidates.jsonl --out ./rankai.csv
 
 Compute budget: ≤ 5 min wall-clock, ≤ 16 GB RAM, CPU only, no network.
 """
@@ -33,7 +33,21 @@ CSV_COLUMNS = ["candidate_id", "rank", "score", "reasoning"]
 
 # Maximum characters for the reasoning field (spec allows longer, but
 # the sample uses ≤400 chars).
-MAX_REASONING_CHARS = 380
+MAX_REASONING_CHARS = 400
+
+
+def _sanitize_csv_value(value: str) -> str:
+    """Sanitize a string value to prevent CSV injection.
+
+    Prefixes dangerous characters with a tab to neutralize formula injection.
+    See: OWASP CSV injection (https://owasp.org/www-community/attacks/CSV_Injection)
+    """
+    if not isinstance(value, str):
+        return value
+    # If value starts with formula-triggering characters, prefix with tab
+    if value and value[0] in ('=', '+', '-', '@', '\t', '\r', '\n'):
+        return '\t' + value
+    return value
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -49,8 +63,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--out",
         type=Path,
-        default=Path("./submission.csv"),
-        help="Path to the output submission.csv (default: ./submission.csv).",
+        default=Path("./rankai.csv"),
+        help="Path to the output rankai.csv (default: ./rankai.csv).",
     )
     parser.add_argument(
         "--top-n",
@@ -77,7 +91,7 @@ def write_submission_csv(
     cand_map: Dict[str, dict],
     out_path: Path,
 ) -> None:
-    """Write the submission CSV in the format required by the competition.
+    """Write the ranking CSV in the format required by the competition.
 
     Args:
         ranked: Exactly 100 :class:`ScoredCandidate` objects, ordered by
@@ -101,7 +115,7 @@ def write_submission_csv(
                 "candidate_id": scored.candidate_id,
                 "rank": i,
                 "score": round(scored.score, 4),
-                "reasoning": reasoning,
+                "reasoning": _sanitize_csv_value(reasoning),
             })
 
 
@@ -154,7 +168,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if honeypots / max(1, len(top)) > 0.10:
         logger.warning(
-            "Honeypot rate %.1f%% exceeds 10%% — submission may be disqualified",
+            "Honeypot rate %.1f%% exceeds 10%% — output may be disqualified",
             100 * honeypots / max(1, len(top)),
         )
 

@@ -7,22 +7,23 @@
 # ============================================================================
 # Team identity
 # ============================================================================
-team_name: "rankai"
+team_name: "GeForce 256"
 
 primary_contact:
-  name: "Lathish"
-  email: "lathish@example.com"
-  phone: "+91-XXXXXXXXXX"
+  name: "PK Lathiss Khumar"
+  email: "pklathisskhumar.cse2024@citchennai.net"
+  phone: "+91-9842423315"
+  role: "Team Lead"
 
 team_members:
-  - name: "Lathish"
-    email: "lathish@example.com"
+  - name: "M Shyam Sundar"
+    email: "shyamsundar23m05@gmail.com"
     role: "ML Engineer"
 
 # ============================================================================
 # Code and reproducibility
 # ============================================================================
-github_repo: "https://github.com/lathish/RankAI"
+github_repo: "https://github.com/SHYAMSUNDAR2396/RankAI"
 
 sandbox_link: ""
 
