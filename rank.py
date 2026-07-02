@@ -2,12 +2,12 @@
 """CLI entry point for the competition-mode ranking pipeline.
 
 Reads ``candidates.jsonl``, scores every candidate with zero LLM calls,
-and writes ``submission.csv`` — the 100-row, 4-column file required by the
+and writes ``rankai.csv`` — the 100-row, 4-column file required by the
 India Runs data-and-AI challenge.
 
 Usage::
 
-    python rank.py --candidates ./candidates.jsonl --out ./submission.csv
+    python rank.py --candidates ./candidates.jsonl --out ./rankai.csv
 
 Compute budget: ≤ 5 min wall-clock, ≤ 16 GB RAM, CPU only, no network.
 """
@@ -15,12 +15,39 @@ Compute budget: ≤ 5 min wall-clock, ≤ 16 GB RAM, CPU only, no network.
 from __future__ import annotations
 
 import argparse
+import csv
 import logging
 import sys
 import time
 from pathlib import Path
+from typing import Dict, List
 
-import config
+from src.ranker.io import load_candidates_jsonl
+from src.ranker.score import ScoredCandidate, score_all, select_top_n
+from src.ranker.reasoning import build_reasoning
+
+logger = logging.getLogger(__name__)
+
+# Submission spec: columns must appear in this exact order.
+CSV_COLUMNS = ["candidate_id", "rank", "score", "reasoning"]
+
+# Maximum characters for the reasoning field (spec allows longer, but
+# the sample uses ≤400 chars).
+MAX_REASONING_CHARS = 400
+
+
+def _sanitize_csv_value(value: str) -> str:
+    """Sanitize a string value to prevent CSV injection.
+
+    Prefixes dangerous characters with a tab to neutralize formula injection.
+    See: OWASP CSV injection (https://owasp.org/www-community/attacks/CSV_Injection)
+    """
+    if not isinstance(value, str):
+        return value
+    # If value starts with formula-triggering characters, prefix with tab
+    if value and value[0] in ('=', '+', '-', '@', '\t', '\r', '\n'):
+        return '\t' + value
+    return value
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -36,8 +63,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--out",
         type=Path,
-        default=Path("./submission.csv"),
-        help="Path to the output submission.csv (default: ./submission.csv).",
+        default=Path("./rankai.csv"),
+        help="Path to the output rankai.csv (default: ./rankai.csv).",
     )
     parser.add_argument(
         "--top-n",
@@ -59,6 +86,39 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def write_submission_csv(
+    ranked: List[ScoredCandidate],
+    cand_map: Dict[str, dict],
+    out_path: Path,
+) -> None:
+    """Write the ranking CSV in the format required by the competition.
+
+    Args:
+        ranked: Exactly 100 :class:`ScoredCandidate` objects, ordered by
+            score descending.
+        cand_map: Mapping candidate_id → original normalized candidate dict
+            (needed for reasoning generation, which reads career_history
+            and signals not carried in ScoredCandidate).
+        out_path: Destination file path.
+    """
+    ranked = sorted(ranked, key=lambda s: (-round(s.score, 4), s.candidate_id))
+
+    with out_path.open("w", newline="", encoding="utf-8") as fh:
+        writer = csv.DictWriter(fh, fieldnames=CSV_COLUMNS)
+        writer.writeheader()
+        for i, scored in enumerate(ranked, start=1):
+            cand = cand_map.get(scored.candidate_id, {})
+            reasoning = build_reasoning(cand, scored.features)
+            if len(reasoning) > MAX_REASONING_CHARS:
+                reasoning = reasoning[:MAX_REASONING_CHARS].rstrip()
+            writer.writerow({
+                "candidate_id": scored.candidate_id,
+                "rank": i,
+                "score": round(scored.score, 4),
+                "reasoning": _sanitize_csv_value(reasoning),
+            })
+
+
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
 
@@ -69,35 +129,47 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     if not args.candidates.exists():
-        logging.error("Candidates file not found: %s", args.candidates)
+        logger.error("Candidates file not found: %s", args.candidates)
         return 1
 
     t0 = time.time()
-    logging.info("Starting competition ranking pipeline")
+    logger.info("Starting competition ranking pipeline")
+    logger.info("Candidates file: %s", args.candidates)
 
-    from pipeline.competition import CompetitionRanker
+    # 1. Stream-load all candidates (normalizes fields for downstream)
+    candidates = list(load_candidates_jsonl(args.candidates))
+    logger.info("Loaded %d candidates", len(candidates))
 
-    ranker = CompetitionRanker()
-    ranked = ranker.rank(
-        args.candidates,
-        top_n=args.top_n,
-        max_candidates=args.max_candidates,
-    )
+    if args.max_candidates:
+        candidates = candidates[: args.max_candidates]
+        logger.info("Capped to %d candidates", len(candidates))
 
-    ranker.write_csv(ranked, args.out)
+    # Build lookup map: candidate_id → normalized candidate dict
+    # (needed for reasoning generation downstream)
+    cand_map: Dict[str, dict] = {c["candidate_id"]: c for c in candidates}
+
+    # 2. Score every candidate (deterministic, no LLM)
+    scored = score_all(candidates)
+    logger.info("Scored %d candidates", len(scored))
+
+    # 3. Select top N (safe-first strategy)
+    top = select_top_n(scored, n=args.top_n)
+    logger.info("Selected top %d candidates", len(top))
+
+    # 4. Write submission CSV
+    write_submission_csv(top, cand_map, args.out)
 
     elapsed = time.time() - t0
-    honeypots = sum(1 for r in ranked if r.get("_is_honeypot"))
-    logging.info(
+    honeypots = sum(1 for s in top if s.is_honeypot)
+    logger.info(
         "Done — %d candidates ranked, %d honeypots in top %d, %.1fs elapsed",
-        len(ranked), honeypots, args.top_n, elapsed,
+        len(top), honeypots, args.top_n, elapsed,
     )
 
-    if honeypots / max(1, len(ranked)) > config.HONEYPOT_HONEYPOT_RATE_DISQUALIFY:
-        logging.warning(
-            "Honeypot rate %.1f%% exceeds %.1f%% — submission may be disqualified",
-            100 * honeypots / max(1, len(ranked)),
-            100 * config.HONEYPOT_HONEYPOT_RATE_DISQUALIFY,
+    if honeypots / max(1, len(top)) > 0.10:
+        logger.warning(
+            "Honeypot rate %.1f%% exceeds 10%% — output may be disqualified",
+            100 * honeypots / max(1, len(top)),
         )
 
     return 0

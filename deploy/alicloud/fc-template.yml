@@ -1,0 +1,41 @@
+{
+  "RVersion": "1.0",
+  "TemplateName": "rankai-fc",
+  "Description": "Serverless RankAI scoring API on Alibaba Cloud Function Compute. POST /api/run triggers an on-demand scoring run; GET /healthz returns server status.",
+  "Parameters": {
+    "Runtime": "custom.debian10",
+    "Handler": "server.fc_app",
+    "MemorySize": 2048,
+    "Timeout": 600,
+    "EnvironmentVariables": {
+      "LLM_BACKEND": "qwen_cloud",
+      "DASHSCOPE_BASE_URL": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "PYTHONUNBUFFERED": "1"
+    },
+    "InternetAccess": true,
+    "InstanceConcurrency": 4,
+    "Code": {
+      "SourceDir": "./"
+    }
+  },
+  "Triggers": [
+    {
+      "TriggerName": "DefaultHTTPTrigger",
+      "TriggerType": "http",
+      "TriggerConfig": {
+        "AuthType": "anonymous",
+        "Methods": ["GET", "POST"]
+      }
+    }
+  ],
+  "CustomDomains": [
+    {
+      "DomainName": "rankai-hackathon.fc.aliyuncs.com",
+      "Protocol": "HTTP",
+      "RouteConfigs": [
+        {"Path": "/api/*", "ServiceName": "RankAI"},
+        {"Path": "/healthz", "ServiceName": "RankAI"}
+      ]
+    }
+  ]
+}

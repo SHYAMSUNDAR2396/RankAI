@@ -374,31 +374,64 @@ def verify_startup(timeout: float = 10.0) -> None:
             unreachable or a required model is missing.
     """
     if config.LLM_BACKEND == "groq":
-        import os
         api_key = config.GROQ_API_KEY or os.environ.get("GROQ_API_KEY")
         if not api_key:
-            logger.error("GROQ_API_KEY is not set. A Groq API key is required when LLM_BACKEND is 'groq'.")
+            logger.error("GROQ_API_KEY is not set.")
             print("ERROR: GROQ_API_KEY is not set.", file=sys.stderr)
             sys.exit(_EXIT_FAILURE)
 
         if not config.EMBEDDING_MODEL:
-            logger.error("Embedding model (config.EMBEDDING_MODEL is not set)")
-            print("ERROR: config.EMBEDDING_MODEL is not set", file=sys.stderr)
+            logger.error("EMBEDDING_MODEL is not set")
+            print("ERROR: EMBEDDING_MODEL is not set", file=sys.stderr)
+            sys.exit(_EXIT_FAILURE)
+        _check_sentence_transformers()
+        logger.info("Startup check passed for Groq backend.")
+    elif config.LLM_BACKEND == "qwen_cloud":
+        api_key = config.QWEN_CLOUD_API_KEY or os.environ.get("DASHSCOPE_API_KEY", "")
+        if not api_key:
+            logger.error("DASHSCOPE_API_KEY is not set.")
+            print(
+                "ERROR: DASHSCOPE_API_KEY is not set. Get a free key at "
+                "https://dashscope.aliyun.com/ — required for the Qwen Cloud "
+                "(Alibaba Cloud) backend.",
+                file=sys.stderr,
+            )
             sys.exit(_EXIT_FAILURE)
 
+        if not config.EMBEDDING_MODEL:
+            logger.error("EMBEDDING_MODEL is not set")
+            print("ERROR: EMBEDDING_MODEL is not set", file=sys.stderr)
+            sys.exit(_EXIT_FAILURE)
+        _check_sentence_transformers()
         try:
-            import importlib.util
-            if importlib.util.find_spec("sentence_transformers") is None:
-                logger.error("sentence-transformers package is missing.")
-                print("ERROR: sentence-transformers package is missing.", file=sys.stderr)
-                sys.exit(_EXIT_FAILURE)
-        except Exception as exc:  # noqa: BLE001
-            logger.debug("Could not probe sentence_transformers: %s", exc)
-
-        logger.info("Startup check passed for Groq backend.")
+            import openai  # noqa: F401 - imported only for the side-effect check
+        except ImportError as exc:
+            logger.error("openai>=1.0 is missing: %s", exc)
+            print(
+                "ERROR: openai>=1.0 is required for LLM_BACKEND='qwen_cloud'. "
+                "Install with: pip install openai>=1.0.0",
+                file=sys.stderr,
+            )
+            sys.exit(_EXIT_FAILURE)
+        logger.info("Startup check passed for Qwen Cloud (Alibaba Cloud) backend.")
     else:
         check_ollama_reachable(timeout=timeout)
         check_models_present()
+
+
+def _check_sentence_transformers() -> None:
+    """Verify that sentence-transformers is importable; exit on failure."""
+    try:
+        import importlib.util
+        if importlib.util.find_spec("sentence_transformers") is None:
+            logger.error("sentence-transformers package is missing.")
+            print(
+                "ERROR: sentence-transformers package is missing.",
+                file=sys.stderr,
+            )
+            sys.exit(_EXIT_FAILURE)
+    except Exception as exc:  # noqa: BLE001
+        logger.debug("Could not probe sentence_transformers: %s", exc)
 
 
 def _load_candidates_from_dir(
@@ -727,6 +760,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
     from pipeline.ingest import JdParser, ResumeParser
     from pipeline.score import CandidateScoringPipeline
     from utils.ollama_client import OllamaClient
+    from utils.qwen_cloud_client import QwenCloudClient
 
     # Wall-clock start used for the elapsed-time summary (Requirement 9.9).
     start_time = time.perf_counter()
@@ -735,7 +769,12 @@ def run_pipeline(args: argparse.Namespace) -> int:
 
     # Build the shared collaborators once and reuse them across every phase so
     # the audit re-scores twins against the same scorer and vector store.
-    ollama_client = OllamaClient()
+    # Both backends expose the same ``chat``/``chat_json`` surface, so the
+    # pipeline modules never branch on backend.
+    if config.LLM_BACKEND == "qwen_cloud":
+        ollama_client = QwenCloudClient()
+    else:
+        ollama_client = OllamaClient()
     parser_resume = ResumeParser(ollama_client)
     parser_jd = JdParser(ollama_client)
     enricher = TrajectoryEnricher(ollama_client)
