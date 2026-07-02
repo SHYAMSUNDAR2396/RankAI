@@ -1,0 +1,49 @@
+name: rankai
+
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: rankai-api:latest
+    container_name: rankai-api
+    restart: unless-stopped
+    env_file:
+      - ../../.env
+    environment:
+      - LLM_BACKEND=${LLM_BACKEND:-qwen_cloud}
+      - DASHSCOPE_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
+      - CHROMA_PERSIST_DIR=/data/chroma
+      - MEMORY_STORE_PATH=/data/memory/rankai_memory.db
+    volumes:
+      - chroma_data:/data/chroma
+      - memory_data:/data/memory
+      - candidate_uploads:/app/data/candidates
+      - pipeline_output:/app/output
+    ports:
+      - "8080:8080"
+    depends_on:
+      - chroma
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  frontend:
+    image: nginx:1.27-alpine
+    container_name: rankai-frontend
+    restart: unless-stopped
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ../../frontend/dist:/usr/share/nginx/html:ro
+    ports:
+      - "8081:80"
+    depends_on:
+      - api
+
+volumes:
+  chroma_data:
+  memory_data:
+  candidate_uploads:
+  pipeline_output:

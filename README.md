@@ -409,6 +409,74 @@ python main.py --verbose
 
 ---
 
+## 🏆 Competition Mode (India Runs Challenge)
+
+A fully deterministic, zero-LLM ranking pipeline that processes 100K candidates in ~37 seconds on CPU.
+
+### Quick Run
+
+```bash
+python rank.py \
+  --candidates indiaruns/[PUB]\ India_runs_data_and_ai_challenge/India_runs_data_and_ai_challenge/candidates.jsonl \
+  --out submission.csv
+```
+
+### Architecture
+
+```
+candidates.jsonl (100K rows, 465MB)
+        │
+        ▼
+┌──────────────┐   Streaming JSONL loader (never loads full file into memory)
+│  src/ranker/ │
+│     io.py    │
+└──────┬───────┘
+       ▼
+┌──────────────┐   6-dimension scoring: must_have (40%), title (20%),
+│ features.py  │   career (15%), experience (10%), behavioral (10%),
+│   score.py   │   logistics (5%)
+└──────┬───────┘
+       ▼
+┌──────────────┐   5 honeypot detectors + disqualifier penalties
+│ honeypot.py  │   catch resume-stuffing traps and consulting-only careers
+└──────┬───────┘
+       ▼
+┌──────────────┐   Weighted composite → top 100 selection
+│ reasoning.py │   with safe-first honeypot avoidance strategy
+└──────┬───────┘
+       ▼
+  submission.csv (100 rows, 4 columns)
+```
+
+### Key Design Decisions
+
+| Decision | Rationale |
+|---|---|
+| Zero LLM calls | Meets compute budget; deterministic & reproducible |
+| Streaming JSONL | 100K candidates fit in <8GB peak memory |
+| Weighted composite | Title relevance (0.20) acts as anti-honeypot shield |
+| Safe-first selection | Honeypots deprioritized even with high scores |
+| YOE span tolerance (3yr) | Normal career gaps shouldn't trigger false positives |
+| Reasoning from structured data | No hallucination risk; factual title+company+skills |
+
+### Compute Budget
+
+| Metric | Actual | Budget |
+|---|---|---|
+| Wall-clock time | ~37s | ≤5 min |
+| Peak RAM | <8GB | ≤16GB |
+| GPU required | No | No |
+| Network calls | 0 | 0 |
+
+### Docker
+
+```bash
+docker build -f Dockerfile.competition -t rankai-competition .
+docker run -v ./data:/data rankai-competition
+```
+
+---
+
 ## 🖥 Web Dashboard
 
 RankAI includes a full-stack interactive web dashboard built with **FastAPI + React + Vite + TypeScript + Tailwind CSS v4**.

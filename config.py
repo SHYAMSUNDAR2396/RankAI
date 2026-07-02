@@ -18,11 +18,21 @@ from __future__ import annotations
 
 import os
 
-# Backend selection: "ollama" or "groq"
+# Backend selection: "ollama", "groq", or "qwen_cloud"
+# "qwen_cloud" routes every LLM call through Alibaba Cloud's Qwen Cloud
+# (DashScope OpenAI-compatible endpoint). All backends share the same Ollama
+# client interface so the rest of the pipeline stays backend-agnostic.
 LLM_BACKEND: str = os.environ.get("LLM_BACKEND", "ollama").lower()
 
 # Groq API Configuration
 GROQ_API_KEY: str = os.environ.get("GROQ_API_KEY", "")
+
+# Qwen Cloud (DashScope) configuration. Get a free key from
+# https://dashscope.aliyun.com/ and supply via DASHSCOPE_API_KEY env var.
+QWEN_CLOUD_API_KEY: str = os.environ.get("DASHSCOPE_API_KEY", "")
+QWEN_CLOUD_BASE_URL: str = os.environ.get(
+    "DASHSCOPE_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1"
+)
 
 # ---------------------------------------------------------------------------
 # Backend and model selection
@@ -56,6 +66,23 @@ GROQ_MODELS = {
     "narrative":        "llama-3.1-8b-instant",
 }
 
+# Qwen Cloud (DashScope) models for the hackathon submission. All routes
+# use Qwen flagship models available on alibaba cloud's Model Studio.
+# Free tier: https://dashscope.aliyun.com/ — request credits via the
+# hackathon coupon form, then set DASHSCOPE_API_KEY.
+QWEN_CLOUD_MODELS = {
+    "parser":           "qwen2.5-14b-instruct",
+    "jd_parser":        "qwen2.5-14b-instruct",
+    "orchestrator":     "qwen3-235b-a22b",
+    "skills_match":     "qwen-turbo",
+    "trajectory":       "qwen3-235b-a22b",
+    "hiring_manager":   "qwen3-235b-a22b",
+    "peer_interviewer": "qwen-max",
+    "devils_advocate":  "qwen3-235b-a22b",
+    "consensus":        "qwen-turbo",
+    "narrative":        "qwen-turbo",
+}
+
 # Hardware-aware override — set True on low-RAM machines (< 20GB)
 LOW_MEMORY_MODE = False  # Set True on Intel 16GB machines
 
@@ -69,6 +96,8 @@ OLLAMA_MODELS_LOW_MEM = {
 
 def get_model(agent_name: str) -> str:
     """Return the appropriate model for a given agent name."""
+    if LLM_BACKEND == "qwen_cloud":
+        return QWEN_CLOUD_MODELS.get(agent_name, "qwen-turbo")
     if LLM_BACKEND == "groq":
         return GROQ_MODELS.get(agent_name, "llama-3.1-8b-instant")
     model_map = OLLAMA_MODELS_LOW_MEM if LOW_MEMORY_MODE else OLLAMA_MODELS
@@ -82,6 +111,13 @@ EMBEDDING_MODEL: str = "BAAI/bge-large-en-v1.5"
 
 #: On-disk directory for the ChromaDB PersistentClient (Requirement 1.3, 10.1).
 CHROMA_PERSIST_DIR: str = "./chroma_store"
+
+#: On-disk path for the persistent memory store. SQLite-backed; lives next to
+#: ChromaDB by default. On Alibaba Cloud deployments this is bind-mounted from
+#: the ``memory_data`` Docker volume so memory survives restarts.
+MEMORY_STORE_PATH: str = os.environ.get(
+    "MEMORY_STORE_PATH", "./memory_store/rankai_memory.db"
+)
 
 
 # ---------------------------------------------------------------------------

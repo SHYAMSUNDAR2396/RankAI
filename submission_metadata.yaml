@@ -1,0 +1,80 @@
+# Redrob Hackathon — Submission Metadata Template
+#
+# Copy this file to your repo root as `submission_metadata.yaml` and fill it in.
+# The fields here should match what you submit via the portal at upload time.
+# Stage 3 review uses this file to verify your portal metadata.
+
+# ============================================================================
+# Team identity
+# ============================================================================
+team_name: "rankai"
+
+primary_contact:
+  name: "Lathish"
+  email: "lathish@example.com"
+  phone: "+91-XXXXXXXXXX"
+
+team_members:
+  - name: "Lathish"
+    email: "lathish@example.com"
+    role: "ML Engineer"
+
+# ============================================================================
+# Code and reproducibility
+# ============================================================================
+github_repo: "https://github.com/lathish/RankAI"
+
+sandbox_link: ""
+
+reproduce_command: "python rank.py --candidates candidates.jsonl --out submission.csv"
+
+# ============================================================================
+# Compute environment
+# ============================================================================
+compute:
+  platform: "Linux x86_64"
+  cpu_cores: 4
+  ram_gb: 16
+  python_version: "3.11.4"
+  os: "Ubuntu 22.04 LTS"
+  uses_gpu_for_inference: false
+  has_network_during_ranking: false
+  pre_computation_required: false
+  pre_computation_time_minutes: 0
+
+# ============================================================================
+# AI tools declaration
+# ============================================================================
+ai_tools_used:
+  - "Claude"
+  - "GitHub Copilot"
+
+ai_usage_summary: |
+  Used Claude (Anthropic) for architecture discussion, algorithm design, and code review.
+  Used GitHub Copilot for autocomplete during implementation.
+  No candidate data was fed to any external LLM.
+  All scoring is fully deterministic with zero network calls during ranking.
+
+# ============================================================================
+# Approach summary (optional but recommended)
+# ============================================================================
+methodology_summary: |
+  Deterministic rule-based ranker with zero LLM calls. Six scoring dimensions
+  combined with a weighted composite formula: must-have skills (40%), title
+  relevance (20%), career trajectory (15%), experience depth (10%), behavioral
+  signals (10%), and location/logistics (5%). Five honeypot detectors catch
+  resume-stuffing traps (timeline impossibility, YOE inflation, title inflation,
+  skill stuffing, expert-without-endorsements). Consulting-only careers and
+  keyword-stuffer patterns receive multiplicative penalties. Streaming JSONL
+  processing keeps peak memory under 8GB for 100K candidates. Full pipeline
+  completes in ~37 seconds on CPU.
+
+# ============================================================================
+# Declarations
+# ============================================================================
+declarations:
+  read_submission_spec: true
+  code_is_original_work: true
+  no_collusion: true
+  honeypot_check_done: true
+  reproduction_tested: true

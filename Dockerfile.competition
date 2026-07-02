@@ -1,0 +1,28 @@
+# Competition-mode Dockerfile for RankAI ranking pipeline
+# One-shot task: reads candidates.jsonl, writes submission.csv
+# No LLM, no FastAPI, no React — stdlib-only scoring pipeline.
+#
+# Usage:
+#   docker build -f Dockerfile.competition -t rankai-competition .
+#   docker run --rm -v $(pwd)/data:/data rankai-competition
+#
+# The container reads /data/candidates.jsonl and writes /data/submission.csv.
+
+FROM python:3.11-slim
+
+LABEL maintainer="RankAI Team"
+LABEL description="Deterministic candidate ranking for the India Runs competition"
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+WORKDIR /app
+
+# No pip install needed — rank.py and src/ranker/ use only Python stdlib.
+
+COPY rank.py /app/rank.py
+COPY src/ /app/src/
+
+VOLUME ["/data"]
+
+ENTRYPOINT ["python", "rank.py", "--candidates", "/data/candidates.jsonl", "--out", "/data/submission.csv"]
