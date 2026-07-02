@@ -3,10 +3,12 @@
 Run with:
     streamlit run sandbox/streamlit_app.py
 
-This app loads a sample of candidates from the JSONL, runs the
-deterministic ranking pipeline, and displays results interactively.
+This app accepts a candidates.jsonl file upload (or uses a local path
+for development), runs the deterministic ranking pipeline, and displays
+results interactively.
 """
 
+import tempfile
 import streamlit as st
 import pandas as pd
 import sys
@@ -18,7 +20,6 @@ sys.path.insert(0, str(project_root))
 
 from src.ranker.io import load_candidates_jsonl
 from src.ranker.score import score_all, select_top_n
-from src.ranker.honeypot import detect_honeypot
 
 st.set_page_config(
     page_title="RankAI — Competition Demo",
@@ -32,32 +33,54 @@ st.markdown(
     "Processes 100K candidates in ~37 seconds on CPU."
 )
 
-# --- Sidebar ---
-st.sidebar.header("Configuration")
+# --- File Upload ---
+st.sidebar.header("📁 Data Source")
+
+# Try local path first, fall back to upload
+LOCAL_JSONL = (
+    project_root
+    / "indiaruns"
+    / "[PUB] India_runs_data_and_ai_challenge"
+    / "India_runs_data_and_ai_challenge"
+    / "candidates.jsonl"
+)
+
+jsonl_path = None
+
+if LOCAL_JSONL.exists():
+    st.sidebar.success(f"Found local file ({LOCAL_JSONL.stat().st_size / 1e6:.0f} MB)")
+    jsonl_path = LOCAL_JSONL
+else:
+    st.sidebar.info("No local file found — upload candidates.jsonl")
+    uploaded = st.sidebar.file_uploader(
+        "Upload candidates.jsonl",
+        type=["jsonl", "json"],
+        help="Upload the 465MB candidates.jsonl from the challenge dataset",
+    )
+    if uploaded is not None:
+        # Save to temp file
+        tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".jsonl")
+        tmp.write(uploaded.read())
+        tmp.close()
+        jsonl_path = Path(tmp.name)
+        st.sidebar.success(f"Uploaded: {uploaded.name} ({uploaded.size / 1e6:.0f} MB)")
+
+# --- Sidebar Config ---
+st.sidebar.header("⚙️ Configuration")
 max_candidates = st.sidebar.slider(
-    "Candidates to load", min_value=100, max_value=10000, value=1000, step=100
+    "Candidates to load", min_value=100, max_value=100000, value=10000, step=1000
 )
 top_n = st.sidebar.slider(
     "Top N to display", min_value=10, max_value=200, value=100, step=10
 )
 
-# --- Data loading ---
-DATA_DIR = (
-    project_root
-    / "indiaruns"
-    / "[PUB] India_runs_data_and_ai_challenge"
-    / "India_runs_data_and_ai_challenge"
-)
-JSONL_PATH = DATA_DIR / "candidates.jsonl"
-
-if not JSONL_PATH.exists():
-    st.error(f"Candidates file not found: {JSONL_PATH}")
-    st.info("Place candidates.jsonl in the expected location.")
+# --- Run pipeline ---
+if jsonl_path is None:
+    st.warning("👆 Upload candidates.jsonl to get started.")
     st.stop()
 
-# --- Run pipeline ---
 with st.spinner("Loading candidates..."):
-    candidates = list(load_candidates_jsonl(JSONL_PATH))[:max_candidates]
+    candidates = list(load_candidates_jsonl(jsonl_path))[:max_candidates]
     st.success(f"Loaded {len(candidates):,} candidates")
 
 with st.spinner("Scoring candidates..."):
@@ -90,9 +113,9 @@ with tab_rank:
     # Download button
     csv = df.to_csv(index=False)
     st.download_button(
-        label="📥 Download CSV",
+        label="📥 Download Top Candidates CSV",
         data=csv,
-        file_name="submission_preview.csv",
+        file_name="rankai_top_candidates.csv",
         mime="text/csv",
     )
 
@@ -104,10 +127,11 @@ with tab_dist:
 
     col1, col2 = st.columns(2)
     with col1:
-        st.metric("All candidates", len(all_scores))
+        st.metric("All candidates", f"{len(all_scores):,}")
         score_series = pd.Series(all_scores)
-        bins = pd.cut(score_series, bins=30).value_counts().sort_index()
-        st.bar_chart(bins)
+        hist_data = score_series.round(3).value_counts().sort_index()
+        chart_df = pd.DataFrame({"score": hist_data.index.astype(str), "count": hist_data.values})
+        st.bar_chart(chart_df.set_index("score"))
     with col2:
         st.metric("Top candidates", len(top_scores))
         st.metric("Min score (top)", f"{min(top_scores):.4f}")

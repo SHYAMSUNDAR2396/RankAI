@@ -25,9 +25,9 @@ team_members:
 # ============================================================================
 github_repo: "https://github.com/SHYAMSUNDAR2396/RankAI"
 
-sandbox_link: ""
+sandbox_link: "https://sandbox-8nsjsfszacnrheymc3kpnt.streamlit.app"
 
-reproduce_command: "python rank.py --candidates candidates.jsonl --out submission.csv"
+reproduce_command: "python rank.py --candidates candidates.jsonl --out rankai.csv"
 
 # ============================================================================
 # Compute environment
@@ -47,8 +47,8 @@ compute:
 # AI tools declaration
 # ============================================================================
 ai_tools_used:
-  - "Claude"
-  - "GitHub Copilot"
+  - "OpenCode"
+  - "MiMo V2.5"
 
 ai_usage_summary: |
   Used Claude (Anthropic) for architecture discussion, algorithm design, and code review.
