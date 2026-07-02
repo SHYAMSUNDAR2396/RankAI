@@ -55,3 +55,6 @@ stitch_rankai_candidate_ranking_dashboard-2/
 python .main.py.txt
 frontend/pnpm-lock.yaml
 *.log
+
+[PUB] India_runs_data_and_ai_challenge/
+indiaruns/
